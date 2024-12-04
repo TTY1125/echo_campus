@@ -8,9 +8,12 @@
             <a-flex justify="space-between">
               <a-flex class="header-left-content"><!-- 左侧内容 -->
                 <a-flex align="center">
-                    <img src="@/assets/logo1.png" style="height: 40px"/>
+                  <img src="@/assets/img/logo1.png" alt="logo_img" @click="refresh1" style="height: 40px; caret-color: transparent;"/>
                 </a-flex>
-                <a-menu v-model:selectedKeys="current" mode="horizontal" :items="items"/>
+                <a-menu v-model:selectedKeys="current"
+                        mode="horizontal"
+                        :items="items"
+                        @click="handleClick"/>
                 <!-- 搜索框 -->
                 <div class="header-search" style="margin-left: 12px">
                   <a-input-search v-model:value="searchContentTemp" placeholder="搜索"
@@ -21,7 +24,7 @@
               </a-flex>
 
               <div class="header-right-content" ><!-- 右侧内容 -->
-                
+
                 <div class="header-item">
                   <span style="padding: 0 10px">写文章</span>
                 </div>
@@ -47,7 +50,7 @@
 
 <script>
 import { h, ref } from 'vue';
-import { GithubOutlined, AppstoreOutlined, TagOutlined , PayCircleOutlined ,InfoCircleOutlined,BookOutlined} from '@ant-design/icons-vue';
+import { HomeOutlined, AppstoreOutlined, TagOutlined , InfoCircleOutlined,BookOutlined} from '@ant-design/icons-vue';
 export default {
   name: 'IndexHeader',
   setup(){
@@ -55,7 +58,7 @@ export default {
     const items = ref([
       {
         key: 'index',
-        icon: () => h(GithubOutlined),
+        icon: () => h(HomeOutlined),
         label: '首页',
       },
       {
@@ -68,11 +71,11 @@ export default {
         icon: () => h(TagOutlined),
         label: '标签',
       },
-      {
-        key: 'auth',
-        icon: () => h(PayCircleOutlined),
-        label: '授权',
-      },
+      // {
+      //   key: 'auth',
+      //   icon: () => h(PayCircleOutlined),
+      //   label: '授权',
+      // },
       {
         key: 'about',
         icon: () => h(InfoCircleOutlined),
@@ -87,6 +90,15 @@ export default {
     return{
       current,
       items,
+    }
+  },
+
+  methods: {
+    refresh1(){
+      this.$router.push('/');
+    },
+    handleClick(event){
+      console.log('click', event);
     }
   }
 }
@@ -121,21 +133,33 @@ export default {
 }
 
 .header-item {
-  // margin:0 16px;
+  //margin:0 16px;
   white-space: nowrap;
 }
 
 /* -------- inline-end -------- */
-/deep/ .ant-menu-horizontal > .ant-menu-item::after, .ant-menu-horizontal > .ant-menu-submenu::after{
-   //border-bottom: 2px solid transparent!important;
+:deep( .ant-menu-horizontal > .ant-menu-item::after),
+:deep( .ant-menu-horizontal > .ant-menu-submenu::after){
+  //border-bottom: 2px solid transparent!important;
   //border:0!important;
 }
 
+:deep( .ant-menu-horizontal > .ant-menu-item::after),
+:deep( .ant-menu-horizontal > .ant-menu-submenu::after){
+  //border-bottom: 2px solid transparent!important;
+  border:0!important;
+}
+
 // 去掉选中后的插入符
-/deep/ .ant-menu-item:focus {
+:deep( .ant-menu-item:focus ){
   caret-color: transparent;
 }
 
+:deep( .ant-menu-item:hover ){
+  background-color: #f0f2f5;
+}
+
+// 去掉底边的描边
 .ant-menu-horizontal {
   border:0!important;
 }

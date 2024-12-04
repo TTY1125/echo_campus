@@ -1,5 +1,8 @@
 <script setup>
-import { LeftCircleOutlined,RightCircleOutlined} from '@ant-design/icons-vue';
+import {
+  LeftCircleOutlined,
+  RightCircleOutlined
+} from '@ant-design/icons-vue';
 </script>
 
 <template>
@@ -14,19 +17,21 @@ import { LeftCircleOutlined,RightCircleOutlined} from '@ant-design/icons-vue';
         <RightCircleOutlined />
       </div>
     </template>
-    <div><h3>1</h3></div>
+    <div>
+        <img src="@/assets/img/indexPic.png" style="height: 100%;width: 100%;object-fit: fill;" alt="index_post_img" />
+    </div>
     <div><h3>2</h3></div>
     <div><h3>3</h3></div>
     <div><h3>4</h3></div>
   </a-carousel>
 </template>
 
-<style scoped>
+<style lang="less" scoped>
 :deep(.slick-slide) {
   text-align: center;
-  height: 300px;
-  line-height: 300px;
-  background: #364d79;
+  //height: 300px;
+  //line-height: 300px;
+  background: #ffffff;
   overflow: hidden;
 }
 
