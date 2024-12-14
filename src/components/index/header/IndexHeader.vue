@@ -30,11 +30,15 @@
                 </div>
 
                 <div class="header-item">
-                  <span style="padding: 0 10px">管理端</span>
+                  <span style="padding: 0 20px">管理端</span>
                 </div>
 
                 <div class="header-item">
-                  <span style="padding: 0 10px">登录</span>
+                  <IndexLogin v-if="!$store.state.isLogin"/>
+                </div>
+
+                <div class="header-item">
+                  <a-button type="primary" @click="showToken">token</a-button>
                 </div>
 
               </div>
@@ -49,10 +53,14 @@
 
 
 <script>
-import { h, ref } from 'vue';
+import {getCurrentInstance, h, ref} from 'vue';
 import { HomeOutlined, AppstoreOutlined, TagOutlined , InfoCircleOutlined,BookOutlined} from '@ant-design/icons-vue';
+import IndexLogin from "@/components/index/header/IndexLogin.vue";
+import {useStore} from "vuex";
+
 export default {
   name: 'IndexHeader',
+  components: {IndexLogin},
   setup(){
     const current = ref(['index']);
     const items = ref([
@@ -87,9 +95,15 @@ export default {
         label: '学习',
       },
     ]);
+    const { proxy } = getCurrentInstance();
+    const store = useStore();
+    const showToken = ()=>{
+      proxy.$message.info(store.state.token,0.5)
+    }
     return{
       current,
       items,
+      showToken,
     }
   },
 
@@ -99,7 +113,7 @@ export default {
     },
     handleClick(event){
       console.log('click', event);
-    }
+    },
   }
 }
 </script>

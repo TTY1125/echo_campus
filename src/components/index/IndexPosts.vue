@@ -13,12 +13,12 @@
               <div class="index-post-content">{{ item.content }}</div>
               <a-row class="index-post-extra" style="align-self: flex-end;color: rgba(0,0,0,0.7);align-items: end">
                 <EyeOutlined style="margin-right: 6px;font-size: 20px;"/>
-                <span style="line-height: 20px;margin-right: 10px">65</span>
-                <LikeOutlined style="margin-right: 6px;font-size: 20px"/>
                 <span style="line-height: 20px;margin-right: 10px">88</span>
+                <LikeOutlined style="margin-right: 6px;font-size: 20px"/>
+                <span style="line-height: 20px;margin-right: 10px">65</span>
                 <MessageOutlined style="margin-right: 6px;font-size: 20px"/>
                 <span style="line-height: 20px;margin-right: 15px;">27</span>
-                <a-avatar src="./assets/img/logo.png"/>
+                <a-avatar :src="require('@/assets/img/logo.png')"/>
                 <span>回声campus</span>
                 <span style="margin-left: 15px;color: rgba(0,0,0,0.7)">1月前</span>
               </a-row>
@@ -48,7 +48,7 @@ export default {
       },
       {
         title: 'Ant Design Title 2',
-        imgSrc: require('@/assets/img/logo.png'),
+        imgSrc: require('@/assets/img/bigdata.png'),
       },
       {
         title: 'Ant Design Title 3',
