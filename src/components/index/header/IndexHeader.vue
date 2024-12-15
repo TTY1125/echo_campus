@@ -38,7 +38,21 @@
                 </div>
 
                 <div class="header-item">
+                  <a-avatar v-if="$store.state.isLogin" :src="avatar">
+
+                    <template #icon v-if="isAvatarNull">
+                      <UserOutlined />
+                    </template>
+
+                  </a-avatar>
+                </div>
+
+                <div class="header-item">
                   <a-button type="primary" @click="showToken">token</a-button>
+                </div>
+
+                <div class="header-item" v-if="$store.state.isLogin">
+                  <a-button type="primary" @click="logout">退出</a-button>
                 </div>
 
               </div>
@@ -54,13 +68,15 @@
 
 <script>
 import {getCurrentInstance, h, ref} from 'vue';
-import { HomeOutlined, AppstoreOutlined, TagOutlined , InfoCircleOutlined,BookOutlined} from '@ant-design/icons-vue';
+import { HomeOutlined, AppstoreOutlined, TagOutlined , InfoCircleOutlined, BookOutlined, UserOutlined} from '@ant-design/icons-vue';
 import IndexLogin from "@/components/index/header/IndexLogin.vue";
 import {useStore} from "vuex";
+import userInfoService from "@/service/userInfoService";
+//import loginService from "@/service/loginService";
 
 export default {
   name: 'IndexHeader',
-  components: {IndexLogin},
+  components: {IndexLogin,UserOutlined},
   setup(){
     const current = ref(['index']);
     const items = ref([
@@ -97,13 +113,22 @@ export default {
     ]);
     const { proxy } = getCurrentInstance();
     const store = useStore();
+    const isAvatarNull = ref(true);
+    const avatar = ref(null);
     const showToken = ()=>{
       proxy.$message.info(store.state.token,0.5)
-    }
+    };
+    const logout = ()=>{
+      //loginService.logout()
+      store.commit("logout");
+    };
     return{
       current,
       items,
+      isAvatarNull,
+      avatar,
       showToken,
+      logout,
     }
   },
 
@@ -114,6 +139,22 @@ export default {
     handleClick(event){
       console.log('click', event);
     },
+  },
+
+  mounted() {
+    if(this.$store.state.isLogin){
+      userInfoService.getUserInfo()
+          .then(res=>{
+            if(res.data.data.profile_picture !== undefined){
+              this.isAvatarNull = false;
+              this.avatar = res.data.data.profile_picture;
+            }
+          })
+          .catch(err => {
+            console.log("获取用户信息错误: ", err);
+            //this.proxy.$message.error(err.desc);
+          })
+    }
   }
 }
 </script>

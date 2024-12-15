@@ -90,6 +90,7 @@ export default {
                   .then(res => {
                     if(res.data.code===0){
                       console.log("登录成功: ", res);
+                      store.commit('loginSuccess');// 通过 mutation 更新 isLogin
                       store.dispatch('setToken', res.data.data);// 通过 action 更新 token
                       console.log("token为: ",store.state.token);
                       // 刷新当前页面
