@@ -8,7 +8,7 @@
             <a-flex justify="space-between">
               <a-flex class="header-left-content"><!-- 左侧内容 -->
                 <a-flex align="center">
-                  <img src="@/assets/img/logo1.png" alt="logo_img" @click="refresh1" style="height: 40px; caret-color: transparent;"/>
+                  <img src="@/assets/img/logo1.png" alt="logo_img" @click="toIndex" style="cursor: pointer;height: 40px; caret-color: transparent;"/>
                 </a-flex>
                 <a-menu v-model:selectedKeys="current"
                         mode="horizontal"
@@ -25,25 +25,24 @@
 
               <div class="header-right-content" ><!-- 右侧内容 -->
 
+
                 <div class="header-item">
-                  <span style="padding: 0 10px">写文章</span>
+                  <a-button type="text" @click="toWrite"><EditOutlined />写文章</a-button>
                 </div>
 
                 <div class="header-item">
-                  <span style="padding: 0 20px">管理端</span>
+                  <a-button type="text" @click="toAdmin"><BarChartOutlined />管理端</a-button>
+                </div>
+
+                <div class="header-item" v-if="!$store.state.isLogin">
+                  <IndexLogin ref="indexLogin"/>
                 </div>
 
                 <div class="header-item">
-                  <IndexLogin v-if="!$store.state.isLogin"/>
-                </div>
-
-                <div class="header-item">
-                  <a-avatar v-if="$store.state.isLogin" :src="avatar">
-
+                  <a-avatar v-if="$store.state.isLogin" :src="avatar" @click = "toUserHomePage" style="cursor: pointer;" >
                     <template #icon v-if="isAvatarNull">
                       <UserOutlined />
                     </template>
-
                   </a-avatar>
                 </div>
 
@@ -52,7 +51,7 @@
                 </div>
 
                 <div class="header-item" v-if="$store.state.isLogin">
-                  <a-button type="primary" @click="logout">退出</a-button>
+                  <a-button type="text" @click="logout"><LogoutOutlined />退出</a-button>
                 </div>
 
               </div>
@@ -68,17 +67,25 @@
 
 <script>
 import {getCurrentInstance, h, ref} from 'vue';
-import { HomeOutlined, AppstoreOutlined, TagOutlined , InfoCircleOutlined, BookOutlined, UserOutlined} from '@ant-design/icons-vue';
+import { HomeOutlined, TagOutlined , InfoCircleOutlined, UserOutlined, EditOutlined, BarChartOutlined, LogoutOutlined} from '@ant-design/icons-vue';
 import IndexLogin from "@/components/index/header/IndexLogin.vue";
 import {useStore} from "vuex";
+import {useRouter} from 'vue-router';
 import userInfoService from "@/service/userInfoService";
 //import loginService from "@/service/loginService";
 
 export default {
   name: 'IndexHeader',
-  components: {IndexLogin,UserOutlined},
+  components: {IndexLogin,UserOutlined,EditOutlined,BarChartOutlined,LogoutOutlined},
   setup(){
+    const indexLogin = ref(null);
     const current = ref(['index']);
+    const { proxy } = getCurrentInstance();
+    const store = useStore();
+    const router = useRouter();
+    const isAvatarNull = ref(true);
+    const userid = ref(0);
+    const avatar = ref(null);
     const items = ref([
       {
         key: 'index',
@@ -86,35 +93,16 @@ export default {
         label: '首页',
       },
       {
-        key: 'subject',
-        icon: () => h(AppstoreOutlined),
-        label: '话题',
-      },
-      {
         key: 'tags',
         icon: () => h(TagOutlined),
         label: '标签',
       },
-      // {
-      //   key: 'auth',
-      //   icon: () => h(PayCircleOutlined),
-      //   label: '授权',
-      // },
       {
         key: 'about',
         icon: () => h(InfoCircleOutlined),
         label: '关于',
       },
-      {
-        key: 'learn',
-        icon: () => h(BookOutlined),
-        label: '学习',
-      },
     ]);
-    const { proxy } = getCurrentInstance();
-    const store = useStore();
-    const isAvatarNull = ref(true);
-    const avatar = ref(null);
     const showToken = ()=>{
       proxy.$message.info(store.state.token,0.5)
     };
@@ -122,39 +110,73 @@ export default {
       //loginService.logout()
       store.commit("logout");
     };
+    const initUserInfo = () =>{
+      if(store.state.isLogin){
+        userInfoService.getUserInfo()
+            .then(res=>{
+              if(res.data.data.profile_picture !== undefined){
+                isAvatarNull.value = false;
+                avatar.value = res.data.data.profile_picture;
+              }
+              if(res.data.data.id !== undefined){
+                userid.value = res.data.data.id;
+                if(store.id === null){
+                  store.commit("setId",userid.value);
+                }
+              }
+            })
+            .catch(err => {
+              console.log("获取用户信息错误: ", err);
+              //this.proxy.$message.error(err.desc);
+            })
+      }
+    }
+
+    const toIndex = () => {
+      router.push('/');
+    };
+    const handleClick = (event) => {
+      console.log('click', event);
+      if(event.key === "index"){
+        toIndex();
+      }
+    };
+    const toUserHomePage = () => {
+      if(userid.value){
+        router.push('/user/'+userid.value);
+      }else{
+        console.log('userid为空！');
+      }
+    };
+    const toWrite = () => {
+      if(!store.state.isLogin){
+        if(indexLogin.value){
+          indexLogin.value.showModal();
+        }
+      }else{
+        router.push('/write');
+      }
+    };
+
     return{
       current,
+      indexLogin,
       items,
       isAvatarNull,
       avatar,
+      userid,
       showToken,
       logout,
+      initUserInfo,
+      toIndex,
+      handleClick,
+      toUserHomePage,
+      toWrite,
     }
-  },
-
-  methods: {
-    refresh1(){
-      this.$router.push('/');
-    },
-    handleClick(event){
-      console.log('click', event);
-    },
   },
 
   mounted() {
-    if(this.$store.state.isLogin){
-      userInfoService.getUserInfo()
-          .then(res=>{
-            if(res.data.data.profile_picture !== undefined){
-              this.isAvatarNull = false;
-              this.avatar = res.data.data.profile_picture;
-            }
-          })
-          .catch(err => {
-            console.log("获取用户信息错误: ", err);
-            //this.proxy.$message.error(err.desc);
-          })
-    }
+    this.initUserInfo();
   }
 }
 </script>
@@ -188,7 +210,7 @@ export default {
 }
 
 .header-item {
-  //margin:0 16px;
+  margin:0 4px;
   white-space: nowrap;
 }
 

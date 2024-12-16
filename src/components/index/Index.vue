@@ -10,18 +10,15 @@
           <IndexCarousel style="margin-bottom: 10px" />
           <!-- 首页帖子 -->
           <IndexPosts :postsList="indexPostsList"/>
-
         </a-col>
 
-        <a-col class="sider" :lg="{span:6}"  :sm="{span:0}" :xs="{span:0}" style="border-left: 20px solid #f0f2f5">
-          <div style="margin-bottom: 20px;height: 200px;  background-color: white;  align-content: center;justify-content: center;  position: sticky;
-  top:64px;">
+        <a-col class="sider" :lg="{span:6}" :sm="{span:0}" :xs="{span:0}" style="border-left: 20px solid #f0f2f5">
+          <div style="margin-bottom: 20px;height: 200px;  background-color: white;  align-content: center;justify-content: center;">
             <!-- <h3 style="font-size: 24px;font-weight: bold;">回声校园</h3> -->
             <img src="../../assets/img/logo1.png" alt="logo_img" style="height: 56px"/>
           </div>
-
-          <div style="margin-bottom: 20px;height: 400px;  background-color: white;text-align: start;  align-items: start;justify-items: start;  position: sticky;
-  top:64px;">
+          <!-- position: sticky; top:64px; -->
+          <div style="margin-bottom: 20px;height: 400px;  background-color: white; text-align: start;  align-items: start;justify-items: start;">
             <span style="font-weight: bold"></span><br/>
             <span style="font-weight: bold"></span>
           </div>
@@ -72,7 +69,7 @@ export default {
 }
 
 #components-layout-basic .main-content {
-  margin-top: 64px;
+  margin-top: 74px;
   width: 100%;
   display:flex;
   background-color: #f0f2f5;
@@ -83,9 +80,9 @@ export default {
 
 #components-layout-basic .sider {
   width:100%;
-  position: sticky;
-  top:64px;
-  z-index: 900;
+  //position: sticky;
+  //top:64px;
+  //z-index: 900;
 }
 
 </style>

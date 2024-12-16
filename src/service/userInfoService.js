@@ -12,10 +12,34 @@ axiosInstance.defaults.withCredentials = true;
 axiosInstance.defaults.headers['Authorization'] = `${token}`;
 
 export default {
-    // 获取用户信息
+    // 获取自己的用户信息
     getUserInfo() {
         return new Promise((resolve, reject) => {
             axiosInstance.get("/users")
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 通过id获取其他用户信息
+    getOtherUserInfo(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get("/users/"+id)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 修改自己的用户信息
+    editUserInfo(data) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.put("/users",data)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 修改自己的头像
+    uploadAvatar(file, config = {}) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.post("/upload/picture",file, config)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
