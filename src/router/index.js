@@ -10,17 +10,17 @@ const routes = [
   {
     path: "/detail/:id",
     name: "detail",
-    //component: () => import("@/components/index/ArticleDetailIndex"),
+    component: () => import("@/components/articleDetail/ArticleDetail.vue"),
   },
   {
     path: "/user/:id",
     name: "user",
-    component: () => import("@/components/userInfo/userHomePage.vue"),
+    component: () => import("@/components/userInfo/UserHomePage.vue"),
   },
   {
     path: "/settings",
     name: "settings",
-    component: () => import("@/components/userInfo/editUserInfo.vue"),
+    component: () => import("@/components/userInfo/EditUserInfo.vue"),
   },
   {
     path: "/write",

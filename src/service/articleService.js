@@ -12,42 +12,34 @@ axiosInstance.defaults.withCredentials = true;
 axiosInstance.defaults.headers['Authorization'] = `${token}`;
 
 export default {
-    // 获取自己的用户信息
-    getUserInfo() {
+    // 上传自己写的文章
+    uploadArticle(data) {
         return new Promise((resolve, reject) => {
-            axiosInstance.get("/users")
+            axiosInstance.post("/posts",data)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     },
-    // 通过id获取其他用户信息
-    getOtherUserInfo(id) {
+    // 获取自己写的文章
+    getMyArticles(id) {
         return new Promise((resolve, reject) => {
             axiosInstance.get("/users/"+id)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     },
-    // 修改自己的用户信息
-    editUserInfo(data) {
+    // 获取首页10篇文章,num是起始index
+    getArticles(num) {
         return new Promise((resolve, reject) => {
-            axiosInstance.put("/users",data)
+            axiosInstance.get("/posts/"+num)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     },
-    // 修改自己的头像
-    uploadAvatar(file, config = {}) {
+    // 通过id查询文章
+    getArticleById(id) {
         return new Promise((resolve, reject) => {
-            axiosInstance.post("/upload/picture",file, config)
-                .then(res => resolve(res))
-                .catch(err => reject(err));
-        });
-    },
-    // 注销自己
-    deleteUser() {
-        return new Promise((resolve, reject) => {
-            axiosInstance.delete("/users")
+            axiosInstance.post("/posts/"+id)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });

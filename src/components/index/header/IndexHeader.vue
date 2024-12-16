@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="header-item" v-if="$store.state.isLogin">
-                  <a-button type="text" @click="logout"><LogoutOutlined />退出</a-button>
+                  <a-button type="text" @click="logout"><LogoutOutlined />退出登录</a-button>
                 </div>
 
               </div>
@@ -72,6 +72,7 @@ import IndexLogin from "@/components/index/header/IndexLogin.vue";
 import {useStore} from "vuex";
 import {useRouter} from 'vue-router';
 import userInfoService from "@/service/userInfoService";
+import loginService from "@/service/loginService";
 //import loginService from "@/service/loginService";
 
 export default {
@@ -107,8 +108,14 @@ export default {
       proxy.$message.info(store.state.token,0.5)
     };
     const logout = ()=>{
-      //loginService.logout()
-      store.commit("logout");
+      loginService.logout()
+          .then(()=>{
+            proxy.$message.info("退出登录成功");
+            store.commit("logout");
+          })
+          .catch(()=>{
+            proxy.$message.error("退出登录失败");
+          })
     };
     const initUserInfo = () =>{
       if(store.state.isLogin){

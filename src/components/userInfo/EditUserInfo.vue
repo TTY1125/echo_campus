@@ -18,15 +18,18 @@
                   编辑个人资料
                 </span>
                 </a-menu-item>
-
                 <a-divider style="margin:5px 0 5px 0;"/>
-
                 <a-menu-item key="uploadAvatar">
                 <span>
                   上传头像
                 </span>
                 </a-menu-item>
-
+                <a-divider style="margin:5px 0 5px 0;"/>
+                <a-menu-item key="accountSettings">
+                <span>
+                  账号设置
+                </span>
+                </a-menu-item>
               </a-menu>
             </a-layout-sider>
 
@@ -104,11 +107,19 @@
                   <a-button>
                     上传头像
                   </a-button>
-
                 </a-upload>
-
               </a-flex>
 
+              <a-flex vertical="vertical" v-if="selectedKeys.includes('accountSettings')" align="center">
+                <a-button type="primary" danger style="margin-top: 30px" @click="showDeleteModal">注销账号</a-button>
+              </a-flex>
+
+              <!-- 注销弹窗 -->
+              <a-modal
+                  v-model:open="isDeleteModalVisible"
+                  title="确定注销吗？（注意！此操作无法回退！）"
+                  @ok="handleDelete"
+                  @cancel="handleDeleteCancle"/>
 
             </a-layout-content>
 
@@ -126,6 +137,7 @@ import userInfoService from "@/service/userInfoService";
 import {useStore} from "vuex";
 //import {useRoute} from 'vue-router';
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
+import router from "@/router";
 export default {
   components: {IndexHeader},
   setup(){
@@ -136,6 +148,7 @@ export default {
     const editForm = ref(null);
     const selectedKeys = ref(["editInfo"]);
     const apiBaseUrl = process.env.VUE_APP_API_BASE_URL+"/upload/picture";
+    const isDeleteModalVisible = ref(false);
     const headers = {
       authorization: store.state.token,
     };
@@ -207,16 +220,41 @@ export default {
       }
     };
 
+    // 显示确认注销弹窗
+    const showDeleteModal = () => {
+      isDeleteModalVisible.value = true;
+    };
+    // 注销用户
+    const handleDelete = () => {
+      userInfoService.deleteUser()
+          .then(()=>{
+            proxy.$message.info("注销成功");
+            store.commit('logout');
+            router.push("/");
+          })
+          .catch(()=>{
+            proxy.$message.error("注销失败");
+          })
+    };
+    // 取消注销
+    const handleDeleteCancle = () => {
+      isDeleteModalVisible.value = false;
+    };
+
     return{
       editForm,
       formValues,
       selectedKeys,
       headers,
       apiBaseUrl,
+      isDeleteModalVisible,
       getCurrentUserInfo,
       handleChange,
       validatePass,
       handleSubmit,
+      showDeleteModal,
+      handleDelete,
+      handleDeleteCancle,
     };
   },
   mounted(){
