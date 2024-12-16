@@ -15,7 +15,6 @@
               >
                 <a-menu-item key="editInfo">
                 <span>
-                  <user-outlined />
                   编辑个人资料
                 </span>
                 </a-menu-item>
@@ -24,7 +23,6 @@
 
                 <a-menu-item key="uploadAvatar">
                 <span>
-                  <user-outlined />
                   上传头像
                 </span>
                 </a-menu-item>
@@ -93,7 +91,7 @@
                 </a-flex>
               </a-form>
 
-              <a-flex vertical="true" v-if="selectedKeys.includes('uploadAvatar')" align="center">
+              <a-flex vertical="vertical" v-if="selectedKeys.includes('uploadAvatar')" align="center">
                 <a-avatar :size="88" :src="formValues.profile_picture ? formValues.profile_picture : require('@/assets/img/default_avatar.png')"
                           style="justify-self: start;margin: 20px 30px"/>
 
