@@ -85,7 +85,7 @@ export default {
         loginForm.value
             .validate()//验证rules规则
             .then(() => {
-              //console.log("表单提交数据: ", formValues.value);
+              console.log("表单提交数据: ", formValues.value);
               loginService.login(formValues.value)
                   .then(res => {
                     if(res.data.code===0){

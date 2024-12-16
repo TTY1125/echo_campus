@@ -27,9 +27,9 @@ export default {
     // 退出登录
     logout() {
         return new Promise((resolve, reject) => {
-            axiosInstance.post("/users/logout", null ,{
+            axiosInstance.get("/users/logout", {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    'Authorization': `${token}`,
                 },
             })
                 .then(res => resolve(res))
