@@ -44,5 +44,20 @@ export default {
                 .catch(err => reject(err));
         });
     },
-
+    // 发送帖子图片
+    submitPostPic(file) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.post("/upload/post",file)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 删除帖子图片
+    deletePostPic(url) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.post("/delete/post",url)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
 }

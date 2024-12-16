@@ -134,7 +134,7 @@ export default {
             })
             .catch(err => {
               console.log("获取用户信息错误: ", err);
-              //this.proxy.$message.error(err.desc);
+              proxy.$message.error("获取用户信息错误",err.desc);
             })
       }
     }
@@ -152,6 +152,7 @@ export default {
       if(userid.value){
         router.push('/user/'+userid.value);
       }else{
+        proxy.$message.error("无法获取userid")
         console.log('userid为空！');
       }
     };
