@@ -60,21 +60,13 @@ export default {
 </script>
 
 <style lang="less" scoped>
-#components-layout-basic .header {
-  position: fixed;
-  z-index: 999;
-  width: 100%;
-  background: #f0f2f5;
-  border-bottom: 1px solid #00000021;
-}
-
 #components-layout-basic .main-content {
   margin-top: 74px;
   width: 100%;
   display:flex;
   background-color: #f0f2f5;
   //background-image:url('@/assets/img/back1.png');
-  background-size: 200px 200px;
+
   background-repeat:repeat;
 }
 

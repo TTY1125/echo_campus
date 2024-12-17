@@ -84,30 +84,26 @@ export default {
       if (loginForm.value) {
         loginForm.value
             .validate()//验证rules规则
-            .then(() => {
-              console.log("表单提交数据: ", formValues.value);
-              loginService.login(formValues.value)
-                  .then(res => {
-                    if(res.data.code===0){
-                      console.log("登录成功: ", res);
-                      store.commit('loginSuccess');// 通过 mutation 更新 isLogin
-                      store.dispatch('setToken', res.data.data);// 通过 action 更新 token
-                      console.log("token为: ",store.state.token);
-                      // 刷新当前页面
-                      router.go(0);
-                      isModalVisible.value = false;
-                    }else{
-                      console.log("登录失败: ", res);
-                      proxy.$message.error(res.data.message);
-                    }
-
-                  })
-                  .catch(err => {
-                    console.log("登录错误: ", err);
-                    proxy.$message.error(err.desc);
-                  });
-
-
+            .then(async () => {
+              try{
+                console.log("表单提交数据: ", formValues.value);
+                let res = await loginService.login(formValues.value);
+                if(res.data.code===0){
+                  console.log("登录成功: ", res);
+                  store.commit('loginSuccess');// 通过 mutation 更新 isLogin
+                  await store.dispatch('setToken', res.data.data);// 通过 action 更新 token
+                  console.log("token为: ",store.state.token);
+                  // 刷新当前页面
+                  router.go(0);
+                  isModalVisible.value = false;
+                }else{
+                  console.log("登录失败: ", res);
+                  proxy.$message.error(res.data.message);
+                }
+              }catch(e) {
+                console.log("登录错误: ", e);
+                proxy.$message.error(e.desc);
+              }
             })
             .catch(error => {
               console.log("表单校验失败: ", error);
