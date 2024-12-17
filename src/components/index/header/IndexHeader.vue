@@ -1,6 +1,6 @@
 <template>
   <a-layout>
-    <a-layout id="components-layout-basic">
+    <a-layout id="header">
 
       <a-layout-header style="background:#ffffff;padding: 0">
         <div class="main-header">
@@ -125,16 +125,17 @@ export default {
                 isAvatarNull.value = false;
                 avatar.value = res.data.data.profile_picture;
               }
-              if(res.data.data.id !== undefined){
+              if(res.data.data.id){
                 userid.value = res.data.data.id;
-                if(store.id === null){
+                if(store.getters.getId === -1){
+                  console.log("获取用户: ",userid.value);
                   store.commit("setId",userid.value);
                 }
               }
             })
             .catch(err => {
               console.log("获取用户信息错误: ", err);
-              //this.proxy.$message.error(err.desc);
+              proxy.$message.error("获取用户信息错误",err.desc);
             })
       }
     }
@@ -152,6 +153,7 @@ export default {
       if(userid.value){
         router.push('/user/'+userid.value);
       }else{
+        proxy.$message.error("无法获取userid")
         console.log('userid为空！');
       }
     };
@@ -189,6 +191,14 @@ export default {
 </script>
 
 <style lang="less" scoped>
+#header {
+  position: fixed;
+  z-index: 999;
+  width: 100%;
+  background: #f0f2f5;
+  border-bottom: 1px solid #00000021;
+}
+
 .main-header {
   width: 100%;
   background: #fff;

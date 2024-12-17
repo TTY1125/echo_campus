@@ -12,52 +12,37 @@ axiosInstance.defaults.withCredentials = true;
 axiosInstance.defaults.headers['Authorization'] = `${token}`;
 
 export default {
-    // 上传自己写的文章
-    uploadArticle(data) {
+    // 点赞
+    like(data) {
         return new Promise((resolve, reject) => {
-            axiosInstance.post("/posts",data)
+            axiosInstance.post("/like",data)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     },
-    // 获取自己写的文章
-    getMyArticles(id) {
+    // 取消点赞
+    notLike(data) {
         return new Promise((resolve, reject) => {
-            axiosInstance.get("/users/"+id)
+            axiosInstance.post('/like/delete',data)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     },
-    // 获取首页10篇文章,num是起始index
-    getArticles(num) {
+    // 查看我自己有没有给这个东西点过赞
+    getIfMyLike(post,comment,reply) {
         return new Promise((resolve, reject) => {
-            axiosInstance.get("/posts/"+num)
+            axiosInstance.get(`/like/exist?post=${post}&comment=${comment}&reply=${reply}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     },
-    // 通过id查询文章
-    getArticleById(id) {
+    // 查看这个东西的点赞量
+    getLikeNum(post,comment,reply) {
         return new Promise((resolve, reject) => {
-            axiosInstance.post("/posts/"+id)
+            axiosInstance.get(`/like?post=${post}&comment=${comment}&reply=${reply}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     },
-    // 发送帖子图片
-    submitPostPic(file) {
-        return new Promise((resolve, reject) => {
-            axiosInstance.post("/upload/post",file)
-                .then(res => resolve(res))
-                .catch(err => reject(err));
-        });
-    },
-    // 删除帖子图片
-    deletePostPic(url) {
-        return new Promise((resolve, reject) => {
-            axiosInstance.post("/delete/post",url)
-                .then(res => resolve(res))
-                .catch(err => reject(err));
-        });
-    },
+
 }
