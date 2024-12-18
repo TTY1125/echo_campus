@@ -29,9 +29,9 @@ export default {
         });
     },
     // 删除评论
-    deleteComments(data) {
+    deleteComments(postId,commentId) {
         return new Promise((resolve, reject) => {
-            axiosInstance.post("/comments",data)
+            axiosInstance.delete(`/comments?post=${postId}&id=${commentId}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });

@@ -93,9 +93,9 @@ export default {
 
 </script>
 
-<style lang="less">
+<style scoped lang="less">
 .main-content{
-  height: 1000px;
+  min-height: 1000px;
 }
 
 </style>

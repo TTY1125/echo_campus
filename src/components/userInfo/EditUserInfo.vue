@@ -119,7 +119,7 @@
                   v-model:open="isDeleteModalVisible"
                   title="确定注销吗？（注意！此操作无法回退！）"
                   @ok="handleDelete"
-                  @cancel="handleDeleteCancle"/>
+                  @cancel="handleDeleteCancel"/>
 
             </a-layout-content>
 
@@ -237,7 +237,7 @@ export default {
           })
     };
     // 取消注销
-    const handleDeleteCancle = () => {
+    const handleDeleteCancel = () => {
       isDeleteModalVisible.value = false;
     };
 
@@ -254,7 +254,7 @@ export default {
       handleSubmit,
       showDeleteModal,
       handleDelete,
-      handleDeleteCancle,
+      handleDeleteCancel,
     };
   },
   mounted(){
