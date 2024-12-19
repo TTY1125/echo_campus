@@ -19,6 +19,7 @@
 <script>
 import {getCurrentInstance, ref} from 'vue';
 import articleService from "@/service/articleService";
+import router from "@/router";
 export default {
   setup(){
     const { proxy } = getCurrentInstance();
@@ -64,6 +65,7 @@ export default {
               articleService.uploadArticle(post)
                   .then(()=>{
                     proxy.$message.success("文章发布成功");
+                    router.push('/');
                   })
                   .catch(err=>{
                     proxy.$message.error(err.desc);

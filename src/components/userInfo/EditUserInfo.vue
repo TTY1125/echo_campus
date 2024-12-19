@@ -2,7 +2,7 @@
   <a-layout id="components-layout-basic">
     <IndexHeader class="header"/>
 
-    <a-row style="height: 1000px;">
+    <a-row style="height: 1000px; padding-top: 64px;background-color: #f0f2f5">
       <a-col :span="16" :offset="4" style="height:140px;margin-top: 35px ">
         <a-layout-content class="main-content">
 
@@ -228,7 +228,7 @@ export default {
     const handleDelete = () => {
       userInfoService.deleteUser()
           .then(()=>{
-            proxy.$message.info("注销成功");
+            proxy.$message.success("注销成功");
             store.commit('logout');
             router.push("/");
           })

@@ -1,7 +1,7 @@
 <template>
   <a-locale-provider :locale="zhCN">
     <div id="app">
-      <router-view/>
+      <router-view :key="$route.params.id"/>
     </div>
   </a-locale-provider>
 </template>

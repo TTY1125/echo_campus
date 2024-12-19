@@ -2,7 +2,7 @@
   <a-layout id="components-layout-basic">
     <IndexHeader class="header"/>
 
-    <a-layout-content style="margin-top:74px;z-index: 0">
+    <a-layout-content style="padding-top: 74px;;z-index: 0">
       <main class="main-content" style="display: flex;">
         <a-col :lg="{span:14,offset:2}" :xs="{span:20,offset:2}">
 
@@ -22,12 +22,23 @@
 
             <a-divider/>
 
-            <!-- 文章点赞 -->
-            <a-flex>
+            <!-- 文章点赞与收藏 --><!-- 两个靠左一个靠右 -->
+            <a-flex style="justify-content: flex-start;">
               <a-button size="large" @click="likePost">
                 <LikeOutlined v-if="!post_is_liked"/>
                 <LikeFilled v-if="post_is_liked"/>
                 <span>点赞: {{postLikeNum}}</span>
+              </a-button>
+
+              <a-button size="large" @click="likePost" style="margin-left: 20px;">
+                <StarOutlined v-if="!post_is_liked"/>
+                <StarFilled v-if="post_is_liked"/>
+                <span>收藏: {{postLikeNum}}</span>
+              </a-button>
+
+              <a-button v-if="userId===postAuthorId" size="large" @click="likePost" style="margin-left: auto;">
+                <DeleteOutlined/>
+                <span>删除文章</span>
               </a-button>
             </a-flex>
 
@@ -61,7 +72,7 @@
 </template>
 
 <script>
-import {LikeOutlined,LikeFilled} from '@ant-design/icons-vue';
+import {LikeOutlined,LikeFilled,StarOutlined,StarFilled,DeleteOutlined} from '@ant-design/icons-vue';
 import {useApp} from "@/useApp";
 import {ref} from "vue";
 import dayjs from 'dayjs';
@@ -76,7 +87,7 @@ dayjs.locale("zh-cn");
 dayjs.extend(relativeTime);
 
 export default {
-  components: {IndexHeader,LikeOutlined,LikeFilled,articleComments},
+  components: {IndexHeader,LikeOutlined,LikeFilled,articleComments,StarOutlined,StarFilled,DeleteOutlined},
   setup(){
     const { route, store, proxy } = useApp();
     const isAvatarNull = ref(true);

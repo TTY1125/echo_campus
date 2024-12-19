@@ -44,5 +44,37 @@ export default {
                 .catch(err => reject(err));
         });
     },
+    // 关注
+    follow(data) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.post("/follow",data)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 取消关注
+    notFollow(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.delete(`/follow/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 查看粉丝数
+    getFollowerNum(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/follow/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 查看粉丝列表
+    getFollowList(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/follow/list/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
 
 }

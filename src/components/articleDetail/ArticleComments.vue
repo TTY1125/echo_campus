@@ -1,7 +1,7 @@
 <template>
   <span style="font-weight: bold;font-size: 18px;display: flex;">评论</span>
 
-  <addComment :avatar="avatar" :post_id="postId"/>
+  <addComment :avatar="avatar" :post_id="postId" style="margin-top: 20px"/>
 
   <a-list
       class="comment-list"
@@ -13,9 +13,9 @@
       <a-list-item>
         <a-comment>
           <template #author>
-            <a>{{item.userName}}</a>
-            <a v-if="item.user_id===userId">(我)</a>
-            <a v-if="item.user_id===postAuthorId">(楼主)</a>
+              <a @click="toUserHomePage(item.user_id)">{{item.userName}}</a>
+              <a @click="toUserHomePage(item.user_id)" v-if="item.user_id===userId">(我)</a>
+              <a @click="toUserHomePage(item.user_id)" v-if="item.user_id===postAuthorId">(楼主)</a>
           </template>
           <template #avatar>
             <a-avatar :src="item.avatar" @click="toUserHomePage(item.user_id)"/>
@@ -27,12 +27,18 @@
 
             <!-- 评论操作 -->
             <a-flex style="caret-color: transparent">
-              <div class="button-item" style="cursor: pointer;margin-right: 4px;" @click="likeComment(item.id)">
-                <LikeOutlined v-if="!item.commentIsLiked"/>
-                <LikeFilled v-if="item.commentIsLiked"/>
+              <div class="button-item" style="cursor: pointer;margin:0 4px 0 0;" @click="likeComment(item.id)">
+                <LikeOutlined v-if="!item.commentIsLiked" style="margin:0 4px;"/>
+                <LikeFilled v-if="item.commentIsLiked" style="margin:0 4px;"/>
+                <span style="margin:0 4px;">{{item.commentLikeNum}}</span>
               </div>
-              <span>{{item.commentLikeNum}}</span>
-              <div class="button-item" v-if="item.user_id === userId" style="cursor: pointer;margin-left: 10px" @click="deleteComment(item.id)">
+
+              <div class="button-item" style="cursor: pointer;margin:0 4px;" @click="showAddComment(item.id)">
+                <MessageOutlined style="margin:0 4px;"/>
+                <span style="margin:0 4px;">{{item.replyNum}}</span>
+              </div>
+
+              <div class="button-item" v-if="item.user_id === userId" style="cursor: pointer;margin-left: 4px" @click="deleteComment(item.id)">
                 <DeleteOutlined />
               </div>
             </a-flex>
@@ -43,6 +49,11 @@
               <span>{{ item.created_at.fromNow() }}</span>
             </a-tooltip>
           </template>
+
+          <article-replies :avatar="avatar" :postId="postId" :postAuthorId="postAuthorId" :userId="userId"
+                           :comment-id="item.id" v-model:addReplyIsShown="item.addReplyIsShown" v-model:replyNum="item.replyNum"
+                           style="background-color: #f0f2f5"/>
+
         </a-comment>
 
       </a-list-item>
@@ -55,8 +66,9 @@
 
 import {defineComponent, reactive, createVNode} from "vue";
 import { Modal } from 'ant-design-vue';
-import {DeleteOutlined, LikeFilled, LikeOutlined, ExclamationCircleOutlined} from "@ant-design/icons-vue";
+import {DeleteOutlined, LikeFilled, LikeOutlined, ExclamationCircleOutlined, MessageOutlined} from "@ant-design/icons-vue";
 import addComment from "@/components/articleDetail/AddComments.vue";
+import articleReplies from "@/components/articleDetail/ArticleReplies.vue";
 import commentService from "@/service/commentService";
 import dayjs from "dayjs";
 import userInfoService from "@/service/userInfoService";
@@ -64,7 +76,7 @@ import likeFavFowService from "@/service/likeFavFowService";
 import {useApp} from "@/useApp";
 
 export default defineComponent({
-  components: {addComment, LikeOutlined, LikeFilled, DeleteOutlined},
+  components: {addComment, LikeOutlined, LikeFilled, DeleteOutlined, articleReplies, MessageOutlined},
   props: {
     avatar: {
       default: () => null
@@ -107,6 +119,8 @@ export default defineComponent({
             avatar: null,
             commentIsLiked: false,
             commentLikeNum: 0,
+            addReplyIsShown: false,
+            replyNum: 0,
           };
           let userRes = await userInfoService.getOtherUserInfo(currComment.user_id);
           currComment.userName = userRes.data.data.username;
@@ -142,11 +156,14 @@ export default defineComponent({
       }
     };
 
-    const deleteComment = async (postId)=>{
+    const deleteComment = async (commentId)=>{
 
       Modal.confirm({
         title: '确定删除这条评论吗?',
         icon: createVNode(ExclamationCircleOutlined),
+        okText: '删除',
+        okType: 'danger',
+        cancelText: '取消',
         content: createVNode(
             'div',
             {
@@ -156,7 +173,7 @@ export default defineComponent({
         ),
         async onOk() {
           try{
-            await commentService.deleteComments(props.postId,postId);
+            await commentService.deleteComments(props.postId,commentId);
             proxy.$message.success("删除评论成功");
             router.go(0);
           }catch (e) {
@@ -164,9 +181,7 @@ export default defineComponent({
             console.log("删除评论失败",e);
           }
         },
-        class: 'test',
       });
-
 
     };
 
@@ -178,6 +193,10 @@ export default defineComponent({
       }
     }
 
+    const showAddComment = commentId =>{
+      const item = commentList.find(item => item.id === commentId);
+      item.addReplyIsShown = !item.addReplyIsShown;
+    }
 
     return{
       commentList,
@@ -185,6 +204,7 @@ export default defineComponent({
       likeComment,
       deleteComment,
       toUserHomePage,
+      showAddComment,
     }
   },
   mounted() {
@@ -196,5 +216,11 @@ export default defineComponent({
 <style scoped lang="less">
 :deep(.button-item:hover){
   color: #1677FF;
+}
+:deep(.ant-comment){
+  width: 100%;
+}
+:deep(.ant-comment-inner){
+  padding: 0!important;
 }
 </style>
