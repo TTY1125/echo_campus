@@ -20,14 +20,6 @@ export default {
                 .catch(err => reject(err));
         });
     },
-    // 获取自己写的文章
-    getMyArticles(id) {
-        return new Promise((resolve, reject) => {
-            axiosInstance.get("/users/"+id)
-                .then(res => resolve(res))
-                .catch(err => reject(err));
-        });
-    },
     // 获取首页10篇文章,num是起始index
     getArticles(num) {
         return new Promise((resolve, reject) => {
@@ -56,6 +48,30 @@ export default {
     deletePostPic(url) {
         return new Promise((resolve, reject) => {
             axiosInstance.post("/delete/post",url)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 获取帖子的评论加回复总量
+    getPostAllCmtRep(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/posts/commentandreply/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 根据用户id获取用户的所有帖子
+    getPostOfUser(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/posts/usergetall/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 查询帖子的封面图片
+    getPostPic(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/posts/picture/${id}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });

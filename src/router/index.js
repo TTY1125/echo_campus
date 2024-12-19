@@ -34,4 +34,8 @@ const router = createRouter({
   routes,
 })
 
+router.afterEach(() => {
+  window.scrollTo(0, 0); // 滚动到页面顶部
+});
+
 export default router;

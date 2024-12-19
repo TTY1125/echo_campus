@@ -1,7 +1,6 @@
 <template>
   <a-layout id="components-layout-basic">
-    <IndexHeader class="header"
-                 @refresh11="refresh2"/>
+    <IndexHeader class="header"/>
 
     <a-layout-content>
       <main class="main-content">
@@ -18,9 +17,10 @@
             <img src="../../assets/img/logo1.png" alt="logo_img" style="height: 56px"/>
           </div>
           <!-- position: sticky; top:64px; -->
-          <div style="margin-bottom: 20px;height: 400px;  background-color: white; text-align: start;  align-items: start;justify-items: start;">
-            <span style="font-weight: bold"></span><br/>
-            <span style="font-weight: bold"></span>
+          <div style="margin-bottom: 20px;height: 400px;display: flex;  background-color: white; justify-content: center;">
+            <FireOutlined />
+            <span style="font-weight: bold;margin-top: 18px;font-size: 20px">热门文章</span>
+
           </div>
 
         </a-col>
@@ -34,34 +34,104 @@
 
 <script>
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
+import { FireOutlined } from '@ant-design/icons-vue';
 import IndexCarousel from "@/components/index/IndexCarousel.vue";
-import IndexPosts from "@/components/index/IndexPosts.vue";
+import IndexPosts from "@/components/index/PostList.vue";
+import {reactive} from "vue";
+import articleService from "@/service/articleService";
+import likeFavFowService from "@/service/likeFavFowService";
+import dayjs from "dayjs";
+import userInfoService from "@/service/userInfoService";
 export default {
   components:{
     IndexCarousel,
     IndexHeader,
     IndexPosts,
+    FireOutlined,
   },
-  data(){
-    return{
-      indexPostsList: [],
-    }
-  },
-  name: 'App',
+  setup(){
+    const indexPostsList = reactive([]);
+    let currIndex = 0;
+    let isLoading = false;
 
-  methods: {
-    refresh2(){
-      window.alert(2);
-      location.reload();
+    const getIndexArticles=async()=>{
+      isLoading = true;
+      try{
+        const articleRes = await articleService.getArticles(currIndex);
+        currIndex+=10;
+        let ret = articleRes.data.data;
+        for(let i in ret){
+          let currPost = {
+            id: ret[i].id,
+            user_id: ret[i].user_id,
+            title: ret[i].title,
+            content: ret[i].content,
+            created_at: dayjs(ret[i].created_at),
+            userName: null,
+            avatar: null,
+            lookNum: 0,
+            likeNum: 0,
+            commentNum: 0,
+            pic: null,
+          };
+          //查询作者信息
+          try{
+            let userRes = await userInfoService.getOtherUserInfo(currPost.user_id);
+            currPost.userName = userRes.data.data.username;
+            currPost.avatar = userRes.data.data.profile_picture;
+          }catch (e) {
+            currPost.userName = "账号已注销";
+            currPost.avatar = "@/assets/img/default_avatar.png";
+          }
+          //查询浏览量，点赞量和评论量
+          let postLikeNumRes = await likeFavFowService.getLikeNum(currPost.id,'','');
+          currPost.likeNum = postLikeNumRes.data.data;
+          let commentNumRes = await articleService.getPostAllCmtRep(currPost.id);
+          currPost.commentNum = commentNumRes.data.data;
+          //查询封面图片
+          let picRes = await articleService.getPostPic(currPost.id);
+          currPost.pic = picRes.data.data;
+          indexPostsList.push(currPost);
+        }
+        isLoading = false;
+      }catch(e){
+        console.log("获取帖子错误",e);
+      }
+    };
+
+    const handleScroll =  () => {
+      const scrollHeight = document.documentElement.scrollHeight; // 文档总高度
+      const scrollTop = window.scrollY || document.documentElement.scrollTop; // 当前滚动的高度
+      const windowHeight = window.innerHeight; // 浏览器窗口的高度
+
+      // 如果滚动到接近底部，加载更多内容
+      if (scrollHeight - scrollTop - windowHeight < 300 && !isLoading) {
+        getIndexArticles(); // 加载更多帖子
+      }
+    };
+
+    return{
+      indexPostsList,
+      getIndexArticles,
+      handleScroll,
     }
-  }
+  },
+  mounted() {
+    this.getIndexArticles();
+    window.addEventListener('scroll', this.handleScroll); // 监听滚动事件
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll); // 销毁组件时移除事件监听
+  },
+  
+  name: 'App',
 }
 
 </script>
 
 <style lang="less" scoped>
 #components-layout-basic .main-content {
-  margin-top: 74px;
+  padding-top: 74px;
   width: 100%;
   display:flex;
   background-color: #f0f2f5;

@@ -2,7 +2,7 @@
   <a-layout id="components-layout-basic">
     <IndexHeader class="header"/>
 
-    <a-layout-content style="margin-top:74px;z-index: 0">
+    <a-layout-content style="padding-top: 74px;;z-index: 0">
       <main class="main-content" style="display: flex;">
         <a-col :lg="{span:14,offset:2}" :xs="{span:20,offset:2}">
 
@@ -22,73 +22,31 @@
 
             <a-divider/>
 
-            <!-- 文章点赞 -->
-            <a-flex>
+            <!-- 文章点赞与收藏 --><!-- 两个靠左一个靠右 -->
+            <a-flex style="justify-content: flex-start;">
               <a-button size="large" @click="likePost">
                 <LikeOutlined v-if="!post_is_liked"/>
                 <LikeFilled v-if="post_is_liked"/>
                 <span>点赞: {{postLikeNum}}</span>
+              </a-button>
+
+              <a-button size="large" @click="likePost" style="margin-left: 20px;">
+                <StarOutlined v-if="!post_is_liked"/>
+                <StarFilled v-if="post_is_liked"/>
+                <span>收藏: {{postLikeNum}}</span>
+              </a-button>
+
+              <a-button v-if="userId===postAuthorId" size="large" @click="likePost" style="margin-left: auto;">
+                <DeleteOutlined/>
+                <span>删除文章</span>
               </a-button>
             </a-flex>
 
           </div>
 
           <div style="width: 100%;min-height: 300px;display:flex;flex-direction:column;background-color:white;margin-top: 20px;padding: 20px 30px;">
-            <span style="font-weight: bold;font-size: 18px;display: flex;">评论</span>
 
-            <addComment :avatar="avatar" :post_id="post_id"/>
-
-            <a-list
-                class="comment-list"
-                :header="`全部评论 ${commentList.length}`"
-                item-layout="horizontal"
-                :data-source="commentList"
-            >
-              <template #renderItem="{ item }">
-                <a-list-item>
-                  <a-comment>
-                    <template #author>
-                      <a>{{item.userName}}</a>
-                      <a v-if="item.user_id===userId">(我)</a>
-                      <a v-if="item.user_id===postAuthorId">(楼主)</a>
-                    </template>
-                    <template #avatar>
-                      <a-avatar :src="item.avatar"/>
-                    </template>
-                    <template #content>
-                      <p style="margin-bottom: 4px">
-                        {{ item.content }}
-                      </p>
-
-                      <!-- 评论点赞 -->
-                      <a-flex style="caret-color: transparent">
-                        <div style="cursor: pointer;margin-right: 4px;" @click="likeComment(item.id)">
-                          <LikeOutlined v-if="!item.commentIsLiked"/>
-                          <LikeFilled v-if="item.commentIsLiked"/>
-                        </div>
-                        <span>{{item.commentLikeNum}}</span>
-
-                        <div v-if="item.user_id === userId" style="cursor: pointer;margin-left: 10px" @click="deleteComment(item.id)">
-                          <DeleteOutlined />
-
-                        </div>
-
-                      </a-flex>
-
-                    </template>
-                    <template #datetime>
-                      <a-tooltip :title="item.created_at.format('YYYY-MM-DD HH:mm:ss')">
-                        <span>{{ item.created_at.fromNow() }}</span>
-                      </a-tooltip>
-                    </template>
-
-
-
-                  </a-comment>
-                </a-list-item>
-              </template>
-            </a-list>
-
+            <articleComments :avatar="avatar" :postId="postId" :postAuthorId="postAuthorId" :userId="userId"/>
 
           </div>
 
@@ -114,15 +72,14 @@
 </template>
 
 <script>
-import {LikeOutlined,LikeFilled,DeleteOutlined} from '@ant-design/icons-vue';
+import {LikeOutlined,LikeFilled,StarOutlined,StarFilled,DeleteOutlined} from '@ant-design/icons-vue';
 import {useApp} from "@/useApp";
-import {reactive, ref} from "vue";
+import {ref} from "vue";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
-import addComment from "@/components/articleDetail/AddComments.vue"
+import articleComments from "@/components/articleDetail/ArticleComments.vue";
 import articleService from "@/service/articleService";
-import commentService from "@/service/commentService";
 import userInfoService from "@/service/userInfoService";
 import likeFavFowService from "@/service/likeFavFowService";
 import "dayjs/locale/zh-cn";
@@ -130,7 +87,7 @@ dayjs.locale("zh-cn");
 dayjs.extend(relativeTime);
 
 export default {
-  components: {IndexHeader,addComment,LikeOutlined,LikeFilled,DeleteOutlined},
+  components: {IndexHeader,LikeOutlined,LikeFilled,articleComments,StarOutlined,StarFilled,DeleteOutlined},
   setup(){
     const { route, store, proxy } = useApp();
     const isAvatarNull = ref(true);
@@ -143,9 +100,8 @@ export default {
     const postLikeNum = ref(0);
     const userId = ref('');
 
-    const commentList = reactive([]);
     const gerCurrentArticle = async() =>{
-      postId.value = route.params.id;
+      postId.value = Number(route.params.id);
       if(route.params.id === '114514'){
         postTitle.value = "测试标题";
         postContent.value = "<p>正文标题</p>";
@@ -164,47 +120,6 @@ export default {
       }catch (e) {
         proxy.$message.error("获取文章信息出错");
         console.log("获取文章信息出错",e);
-      }
-    };
-
-    const getCurrentComments = async () =>{
-      // if(route.params.id === '114514'){
-      //   commentList.value = [
-      //     {
-      //       id: 1,
-      //       user_id: 1,
-      //       content: '一条测试评论',
-      //       created_at: dayjs('2024-12-10 14:30:00'),
-      //     },
-      //   ]
-      // }
-      try{
-        let commentsRes = await commentService.getComments(0,route.params.id);
-        let ret = commentsRes.data.data;
-        for(let i in ret){
-          let currComment = {
-            id: ret[i].id,
-            user_id: ret[i].user_id,
-            content: ret[i].content,
-            created_at: dayjs(ret[i].created_at),
-            userName: null,
-            avatar: null,
-            commentIsLiked: false,
-            commentLikeNum: 0,
-          };
-          let userRes = await userInfoService.getOtherUserInfo(currComment.user_id);
-          currComment.userName = userRes.data.data.username;
-          currComment.avatar = userRes.data.data.profile_picture;
-          //点赞
-          let isMyLike = await likeFavFowService.getIfMyLike(postId.value,currComment.id,'');
-          currComment.commentIsLiked = isMyLike.data.data===1;
-          let postLikeNumRes = await likeFavFowService.getLikeNum(postId.value,currComment.id,'');
-          currComment.commentLikeNum = postLikeNumRes.data.data;
-          commentList.push(currComment);
-        }
-      }catch (e) {
-        proxy.$message.error("获取评论失败");
-        console.log("获取评论失败",e.desc);
       }
     };
 
@@ -242,67 +157,24 @@ export default {
       }
     };
 
-    const likeComment = async (commentId)=>{
-      try{
-        let data = {post_id:postId.value,comment_id:commentId};
-        const item = commentList.find(item => item.id === commentId);
-        if(!item.commentIsLiked){//点赞
-          await likeFavFowService.like(data);
-          item.commentIsLiked = true;
-        }else{//取消点赞
-          await likeFavFowService.notLike(data);
-          item.commentIsLiked = false;
-        }
-        let postLikeNumRes = await likeFavFowService.getLikeNum(postId.value,commentId,'');
-        item.commentLikeNum = postLikeNumRes.data.data;
-      }catch (e) {
-        proxy.$message.error("点赞处理失败");
-        console.log("点赞处理失败",e);
-      }
-    };
-
-    const deleteComment = async (commentId)=>{
-      try{
-        let data = {post_id:postId.value,comment_id:commentId};
-        const item = commentList.find(item => item.id === commentId);
-        if(!item.commentIsLiked){//点赞
-          await likeFavFowService.like(data);
-          item.commentIsLiked = true;
-        }else{//取消点赞
-          await likeFavFowService.notLike(data);
-          item.commentIsLiked = false;
-        }
-        let postLikeNumRes = await likeFavFowService.getLikeNum(postId.value,commentId,'');
-        item.commentLikeNum = postLikeNumRes.data.data;
-      }catch (e) {
-        proxy.$message.error("点赞处理失败");
-        console.log("点赞处理失败",e);
-      }
-    };
-
     return{
       postTitle,
       postContent,
       postLikeNum,
-      commentList,
       isAvatarNull,
       avatar,
       userId,
       postAuthorId,
-      post_id: postId,
+      postId,
       post_is_liked: postIsLiked,
       gerCurrentArticle,
-      getCurrentComments,
       initUserInfo,
       likePost,
-      likeComment,
-      deleteComment,
     }
   },
   mounted() {
     this.initUserInfo();
     this.gerCurrentArticle();
-    this.getCurrentComments();
   }
 };
 </script>

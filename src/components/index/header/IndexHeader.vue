@@ -67,7 +67,8 @@
 
 <script>
 import {getCurrentInstance, h, ref} from 'vue';
-import { HomeOutlined, TagOutlined , InfoCircleOutlined, UserOutlined, EditOutlined, BarChartOutlined, LogoutOutlined} from '@ant-design/icons-vue';
+import { HomeOutlined, TagOutlined , InfoCircleOutlined,
+  UserOutlined, EditOutlined, BarChartOutlined, LogoutOutlined} from '@ant-design/icons-vue';
 import IndexLogin from "@/components/index/header/IndexLogin.vue";
 import {useStore} from "vuex";
 import {useRouter} from 'vue-router';
@@ -110,7 +111,7 @@ export default {
     const logout = ()=>{
       loginService.logout()
           .then(()=>{
-            proxy.$message.info("退出登录成功");
+            proxy.$message.success("退出登录成功");
             store.commit("logout");
           })
           .catch(()=>{

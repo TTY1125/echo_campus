@@ -12,26 +12,26 @@ axiosInstance.defaults.withCredentials = true;
 axiosInstance.defaults.headers['Authorization'] = `${token}`;
 
 export default {
-    // 通过post_id查询100条评论
-    getComments(num,post_id) {
+    // 通过comment和post_id查询100条回复
+    getReplies(num,comment,post_id) {
         return new Promise((resolve, reject) => {
-            axiosInstance.get(`/comments?post=${post_id}&num=${num}`)
+            axiosInstance.get(`/replies?post=${post_id}&comment=${comment}&num=${num}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     },
-    // 发表评论
-    addComments(data) {
+    // 发表回复
+    addReply(data) {
         return new Promise((resolve, reject) => {
-            axiosInstance.post("/comments",data)
+            axiosInstance.post("/replies",data)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     },
-    // 删除评论
-    deleteComments(postId,commentId) {
+    // 删除回复
+    deleteReply(postId,replyId) {
         return new Promise((resolve, reject) => {
-            axiosInstance.delete(`/comments?post=${postId}&id=${commentId}`)
+            axiosInstance.delete(`/replies?post=${postId}&id=${replyId}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
