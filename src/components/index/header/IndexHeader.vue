@@ -23,9 +23,7 @@
                 </div>
               </a-flex>
 
-              <div class="header-right-content" ><!-- 右侧内容 -->
-
-
+              <a-flex class="header-right-content" style="align-content: center"><!-- 右侧内容 -->
                 <div class="header-item">
                   <a-button type="text" @click="toWrite"><EditOutlined />写文章</a-button>
                 </div>
@@ -53,8 +51,7 @@
                 <div class="header-item" v-if="$store.state.isLogin">
                   <a-button type="text" @click="logout"><LogoutOutlined />退出登录</a-button>
                 </div>
-
-              </div>
+              </a-flex>
             </a-flex>
           </a-col>
 

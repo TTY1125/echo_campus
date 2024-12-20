@@ -1,6 +1,6 @@
 <template>
   <div id="main-post-content">
-    <a-list item-layout="vertical" :data-source="postsList"><!-- postsListShow传入data-source，拆解成#renderItem后给item -->
+    <a-list item-layout="vertical" :data-source="dataList"><!-- postsListShow传入data-source，拆解成#renderItem后给item -->
       <template #renderItem = "{ item }"><!-- a-list-item传入#renderitem，子组件（插槽）的item传入父组件 -->
         <a-list-item class="list-item" @click="goToDetail(item.id)">
           <a-flex  style="caret-color: transparent;margin: 6px 0 6px 0">
@@ -61,7 +61,7 @@ export default {
     MessageOutlined
   },
   props: {
-    postsList: {
+    dataList: {
       type: Array,
       default: () => []
     }
@@ -69,36 +69,6 @@ export default {
   setup() {
     const {router,proxy} = useApp();
 
-    // const postsListShow = ref([
-    //   {
-    //     id: 114514,
-    //     title: '数据分析：探索数据背后的秘密与挑战',
-    //     content: '数据分析是一项复杂而富有挑战性的工作，它要求分析师具备扎实的统计学基础、熟练的数据处理技能、敏锐的业务洞察力以及良好的沟通协调能力。面对上述重难点，持续学习、实践和创新是提升数据分析能力的不二法门。随着技术的不断进步和应用的深化，数据分析将继续在推动社会经济发展中发挥重要作用，而克服这些挑战，将使我们更好地挖掘数据的潜力，创造更大的价值。',
-    //     imgSrc: require('@/assets/img/bigdata.png')
-    //   },
-    //   {
-    //     id: 114514,
-    //     title: '数据分析：探索数据背后的秘密与挑战',
-    //     content: '数据分析是一项复杂而富有挑战性的工作，它要求分析师具备扎实的统计学基础、熟练的数据处理技能、敏锐的业务洞察力以及良好的沟通协调能力。面对上述重难点，持续学习、实践和创新是提升数据分析能力的不二法门。随着技术的不断进步和应用的深化，数据分析将继续在推动社会经济发展中发挥重要作用，而克服这些挑战，将使我们更好地挖掘数据的潜力，创造更大的价值。',
-    //     imgSrc: require('@/assets/img/bigdata.png')
-    //   },
-    //   {
-    //     id: 114514,
-    //     title: '数据分析：探索数据背后的秘密与挑战',
-    //     content: '数据分析是一项复杂而富有挑战性的工作，它要求分析师具备扎实的统计学基础、熟练的数据处理技能、敏锐的业务洞察力以及良好的沟通协调能力。面对上述重难点，持续学习、实践和创新是提升数据分析能力的不二法门。随着技术的不断进步和应用的深化，数据分析将继续在推动社会经济发展中发挥重要作用，而克服这些挑战，将使我们更好地挖掘数据的潜力，创造更大的价值。',
-    //     imgSrc: require('@/assets/img/bigdata.png')
-    //   },
-    //   {
-    //     id: 114514,
-    //     title: '数据分析：探索数据背后的秘密与挑战',
-    //     content: '数据分析是一项复杂而富有挑战性的工作，它要求分析师具备扎实的统计学基础、熟练的数据处理技能、敏锐的业务洞察力以及良好的沟通协调能力。面对上述重难点，持续学习、实践和创新是提升数据分析能力的不二法门。随着技术的不断进步和应用的深化，数据分析将继续在推动社会经济发展中发挥重要作用，而克服这些挑战，将使我们更好地挖掘数据的潜力，创造更大的价值。',
-    //     imgSrc: require('@/assets/img/bigdata.png')
-    //   },
-    // ]);
-
-    const goToDetail = id =>{
-      router.push("/detail/"+id);
-    };
     const toUserHomePage = userId =>{
       if(userId){
         router.push('/user/'+userId);
@@ -108,7 +78,6 @@ export default {
     };
 
     return {
-      goToDetail,
       toUserHomePage,
     };
   },

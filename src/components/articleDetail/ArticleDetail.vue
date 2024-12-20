@@ -8,6 +8,16 @@
 
           <div class="title_content" style="background-color: white;padding: 20px 30px;">
             <span style="font-weight: bold;font-size: 32px;display: flex;">{{postTitle}}</span>
+
+            <a-flex style="margin-top: 10px;justify-content: flex-start;">
+              <a-avatar :src="postAuthorAvatar" :size="48"/>
+              <a-flex vertical="vertical">
+                <span>{{postAuthorName}}</span>
+                <span>{{postCreatedAt}}</span>
+              </a-flex>
+              <a-button style="margin-left:auto" v-if="userId!==postAuthorId" @click="follow">关注</a-button>
+            </a-flex>
+
             <div class="article-content" style="width: 100%" v-if="postContent">
               <mavon-editor
                   v-model="postContent"
@@ -96,6 +106,9 @@ export default {
     const postContent = ref('');
     const postId = ref(-1);
     const postAuthorId = ref(-1);
+    const postAuthorAvatar = ref(null);
+    const postAuthorName = ref(null);
+    const postCreatedAt = ref(null);
     const postIsLiked = ref(false);
     const postLikeNum = ref(0);
     const userId = ref('');
@@ -116,6 +129,9 @@ export default {
         postTitle.value = postRes.data.data.title;
         postContent.value = postRes.data.data.content;
         postAuthorId.value = postRes.data.data.user_id;
+        postAuthorName.value = postRes.data.data.username;
+        postAuthorAvatar.value = postRes.data.data.profile_picture;
+        postCreatedAt.value = postRes.data.data.created_at;
         userId.value = store.getters.getId;
       }catch (e) {
         proxy.$message.error("获取文章信息出错");
@@ -157,6 +173,15 @@ export default {
       }
     };
 
+    const follow = async () =>{
+      try {
+        await likeFavFowService.follow(postAuthorId);
+        proxy.$message.success("关注成功");
+      }catch (e) {
+        proxy.$message.error("关注失败");
+      }
+    };
+
     return{
       postTitle,
       postContent,
@@ -165,11 +190,15 @@ export default {
       avatar,
       userId,
       postAuthorId,
+      postAuthorAvatar,
+      postAuthorName,
       postId,
+      postCreatedAt,
       post_is_liked: postIsLiked,
       gerCurrentArticle,
       initUserInfo,
       likePost,
+      follow,
     }
   },
   mounted() {

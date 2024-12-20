@@ -18,8 +18,10 @@
           </div>
           <!-- position: sticky; top:64px; -->
           <div style="margin-bottom: 20px;height: 400px;display: flex;  background-color: white; justify-content: center;">
-            <FireOutlined />
-            <span style="font-weight: bold;margin-top: 18px;font-size: 20px">热门文章</span>
+            <a-flex style="margin-top: 18px;height: 30px;align-content: center">
+              <FireOutlined style="font-size: 20px"/>
+              <span style="font-weight: bold;font-size: 20px;text-align:center;">热门文章</span>
+            </a-flex>
 
           </div>
 
