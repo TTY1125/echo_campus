@@ -1,26 +1,41 @@
 <template>
-  <a-flex align="center">
-    <a-input class="write-item" v-model:value="title" placeholder="输入文章标题" size="large"/>
-    <a-button type="primary" @click="submit">发布文章</a-button>
-  </a-flex>
+  <a-row style="min-height: 800px">
+    <a-col :span="16" :offset="4">
 
-  <div style="height: 92%;width: 100%">
-    <mavon-editor
-        ref=md
-        v-model="content_md"
-        @imgAdd="imgAdd"
-        @imgDel="imgDel"
-        @change="markdownChange"
-        style="z-index: 0"/>
-  </div>
+      <a-flex align="center" style="margin: 10px 0 ">
+        <a-button style="height: 100%;" @click="toIndex">
+          <ArrowLeftOutlined/>
+          <span>返回首页</span>
+        </a-button>
+        <a-input class="write-item" v-model:value="title" placeholder="输入文章标题" size="large" style="margin:0 10px;"/>
+        <a-button type="primary" @click="submit">发布文章</a-button>
+      </a-flex>
+
+      <div style="height: 92%;width: 100%;">
+        <mavon-editor
+            ref=md
+            v-model="content_md"
+            @imgAdd="imgAdd"
+            @imgDel="imgDel"
+            @change="markdownChange"
+            style="z-index: 0"/>
+      </div>
+
+    </a-col>
+  </a-row>
+
 
 </template>
 
 <script>
+import {ArrowLeftOutlined} from '@ant-design/icons-vue';
 import {getCurrentInstance, ref} from 'vue';
 import articleService from "@/service/articleService";
 import router from "@/router";
 export default {
+  components:{
+    ArrowLeftOutlined,
+  },
   setup(){
     const { proxy } = getCurrentInstance();
     const md = ref(null);
@@ -91,6 +106,10 @@ export default {
       delete img_file.value[pos];
     };
 
+    const toIndex = ()=>{
+      router.push('/');
+    }
+
     return{
       md,
       title,
@@ -99,6 +118,7 @@ export default {
       submit,
       imgAdd,
       imgDel,
+      toIndex,
     };
   },
 

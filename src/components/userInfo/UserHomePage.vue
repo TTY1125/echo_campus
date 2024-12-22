@@ -26,7 +26,7 @@
                   :items="menuItems"
                   style="caret-color: transparent"/>
 
-          <PostList :postsList="myPostsList"/>
+          <PostList :postsList="userPostsList"/>
 
         </div>
 
@@ -53,8 +53,10 @@ export default {
     const {proxy,store,route,router} = useApp();
     const isSelf = ref(false);
     let isLoading = false;
-    const myPostsList = reactive([]);
-    const selectedKeys = ref([]);
+    const userPostsList = reactive([]);
+    const userFollowList = reactive([]);
+    const userFavouriteList = reactive([]);
+    const selectedKeys = ref(['post']);
 
     const menuItems = ref([
       {
@@ -118,8 +120,7 @@ export default {
       }catch (e) {
         proxy.$message.error("关注失败");
       }
-
-    }
+    };
     const getMyArticles=async()=>{
       isLoading = true;
       try{
@@ -153,7 +154,7 @@ export default {
           currPost.likeNum = postLikeNumRes.data.data;
           let commentNumRes = await commentService.getComments(0,currPost.id);
           currPost.commentNum = commentNumRes.data.data.length;
-          myPostsList.push(currPost);
+          userPostsList.push(currPost);
         }
         isLoading = false;
       }catch(e){
@@ -176,7 +177,10 @@ export default {
       userData,
       isSelf,
       menuItems,
-      myPostsList,
+      userPostsList,
+      userFollowList,
+      userFavouriteList,
+      selectedKeys,
       getCurrentUserInfo,
       toEditUserInfo,
       getMyArticles,
