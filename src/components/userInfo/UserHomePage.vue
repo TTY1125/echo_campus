@@ -14,7 +14,8 @@
             </div>
           </a-flex>
           <a-flex :vertical="true" style="align-self: center">
-            <a-button style="margin-right: 20px" v-if="!isSelf" @click="follow">关注</a-button>
+            <FollowButton :id="userData.id" v-if="!isSelf"/>
+
             <a-button style="margin-right: 20px" v-if="isSelf" @click="toEditUserInfo">编辑个人资料</a-button>
           </a-flex>
         </a-flex>
@@ -26,7 +27,10 @@
                   :items="menuItems"
                   style="caret-color: transparent"/>
 
-          <PostList :postsList="userPostsList"/>
+          <PostList :postsList="userPostsList" v-if="selectedKeys.includes('post')"/>
+
+          <PostList :postsList="userFavouriteList" v-if="selectedKeys.includes('favourite')"/>
+
 
         </div>
 
@@ -43,21 +47,30 @@ import {useApp} from "@/useApp";
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import {ProfileOutlined, HeartOutlined, StarOutlined} from "@ant-design/icons-vue";
 import PostList from "@/components/index/PostList.vue";
+import followButton from "@/components/button/FollowButton.vue";
 import articleService from "@/service/articleService";
 import dayjs from "dayjs";
 import likeFavFowService from "@/service/likeFavFowService";
 import commentService from "@/service/commentService";
+import FollowButton from "@/components/button/FollowButton.vue";
 export default {
-  components: {PostList, IndexHeader},
+  components: {FollowButton, PostList, IndexHeader, followButton},
   setup(){
-    const {proxy,store,route,router} = useApp();
+    const {store,route,router} = useApp();
     const isSelf = ref(false);
     let isLoading = false;
     const userPostsList = reactive([]);
     const userFollowList = reactive([]);
     const userFavouriteList = reactive([]);
     const selectedKeys = ref(['post']);
-
+    const userId = ref(-1);
+    const userData = ref({
+      id: "",
+      userName: "用户名",
+      email: "邮箱",
+      profile_picture: null,
+      bio: "个性签名",
+    });
     const menuItems = ref([
       {
         key: 'post',
@@ -75,52 +88,23 @@ export default {
         label: '收藏',
       },
     ]);
-    const userData = ref({
-      id: "",
-      userName: "用户名",
-      email: "邮箱",
-      profile_picture: null,
-      bio: "个性签名",
-    });
+
     const getCurrentUserInfo = async () => {
-      //Number(route.params.id)
-      userInfoService.getOtherUserInfo(route.params.id)
-          .then(res => {
-            userData.value = res.data.data;
-            console.log("初始获取用户信息：",userData);
-            if(store.getters.getId === undefined || store.getters.getId === null){
-              userInfoService.getUserInfo()
-                  .then(res=>{
-                    store.commit("setId",res.data.data.id);
-                    if(userData.value.id === store.getters.getId){
-                      isSelf.value = true;
-                    }
-                  })
-                  .catch(err => {
-                    console.log("获取用户信息错误: ", err);
-                    //this.proxy.$message.error(err.desc);
-                  })
-            }else{
-              if(userData.value.id === store.getters.getId){
-                isSelf.value = true;
-              }
-            }
-          })
-          .catch(err => {
-            console.log("获取用户信息错误: ", err);
-          });
+      try {
+        const infoRes = await userInfoService.getCurrentUserInfo();
+        userData.value = infoRes.data.data;
+        console.log("初始获取用户信息：",userData);
+        if(store.getters.isLoggedIn){
+          isSelf.value = store.getters.getId === userData.value.id;
+        }
+      }catch (e) {
+        console.log("获取用户信息错误: ", e);
+      }
     };
     const toEditUserInfo = () =>{
       router.push('/settings');
     };
-    const follow = async () =>{
-      try {
-        await likeFavFowService.follow(route.params.id);
-        proxy.$message.success("关注成功");
-      }catch (e) {
-        proxy.$message.error("关注失败");
-      }
-    };
+
     const getMyArticles=async()=>{
       isLoading = true;
       try{
@@ -161,6 +145,7 @@ export default {
         console.log("获取帖子错误",e);
       }
     };
+
     const handleScroll =  () => {
       const scrollHeight = document.documentElement.scrollHeight; // 文档总高度
       const scrollTop = window.scrollY || document.documentElement.scrollTop; // 当前滚动的高度
@@ -175,6 +160,7 @@ export default {
     };
     return{
       userData,
+      userId,
       isSelf,
       menuItems,
       userPostsList,
@@ -185,12 +171,11 @@ export default {
       toEditUserInfo,
       getMyArticles,
       handleScroll,
-      follow,
     };
   },
   async mounted(){
-    this.getCurrentUserInfo();
-    this.getMyArticles();
+    await this.getCurrentUserInfo();
+    await this.getMyArticles();
     window.addEventListener('scroll', this.handleScroll); // 监听滚动事件
   },
   beforeUnmount() {
