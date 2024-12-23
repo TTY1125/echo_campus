@@ -10,7 +10,7 @@
                 <a-flex align="center">
                   <img src="@/assets/img/logo1.png" alt="logo_img" @click="toIndex" style="cursor: pointer;height: 40px; caret-color: transparent;"/>
                 </a-flex>
-                <a-menu v-model:selectedKeys="current"
+                <a-menu v-model:selectedKeys="currSelectedKeys"
                         mode="horizontal"
                         :items="items"
                         @click="handleClick"/>
@@ -63,25 +63,21 @@
 
 
 <script>
-import {getCurrentInstance, h, ref} from 'vue';
+import { h, ref } from 'vue';
 import { HomeOutlined, TagOutlined , InfoCircleOutlined,
   UserOutlined, EditOutlined, BarChartOutlined, LogoutOutlined} from '@ant-design/icons-vue';
 import IndexLogin from "@/components/index/header/IndexLogin.vue";
-import {useStore} from "vuex";
-import {useRouter} from 'vue-router';
+import { useApp } from "@/useApp";
 import userInfoService from "@/service/userInfoService";
 import loginService from "@/service/loginService";
-//import loginService from "@/service/loginService";
 
 export default {
   name: 'IndexHeader',
   components: {IndexLogin,UserOutlined,EditOutlined,BarChartOutlined,LogoutOutlined},
   setup(){
     const indexLogin = ref(null);
-    const current = ref(['index']);
-    const { proxy } = getCurrentInstance();
-    const store = useStore();
-    const router = useRouter();
+    const currSelectedKeys = ref(['index']);
+    const { proxy, store, route, router } = useApp();
     const isAvatarNull = ref(true);
     const userid = ref(0);
     const avatar = ref(null);
@@ -92,7 +88,7 @@ export default {
         label: '首页',
       },
       {
-        key: 'tags',
+        key: 'label',
         icon: () => h(TagOutlined),
         label: '标签',
       },
@@ -141,10 +137,21 @@ export default {
     const toIndex = () => {
       router.push('/');
     };
+    const toTags = () => {
+      router.push('/label');
+    };
+
+    const toAdmin = () => {
+      router.push('/admin');
+    };
+
     const handleClick = (event) => {
       console.log('click', event);
       if(event.key === "index"){
         toIndex();
+      }
+      if(event.key === "label"){
+        toTags();
       }
     };
     const toUserHomePage = () => {
@@ -165,8 +172,22 @@ export default {
       }
     };
 
+    const getCurrSelectedKeys = ()=>{
+      let currName = route.name;
+      currSelectedKeys.value.pop();
+      if (currName === 'index'){
+        currSelectedKeys.value.push('index');
+      }
+      if (currName === 'label'){
+        currSelectedKeys.value.push('label');
+      }
+      if (currName === 'about'){
+        currSelectedKeys.value.push('about');
+      }
+    }
+
     return{
-      current,
+      currSelectedKeys,
       indexLogin,
       items,
       isAvatarNull,
@@ -176,13 +197,17 @@ export default {
       logout,
       initUserInfo,
       toIndex,
+      toTags,
       handleClick,
       toUserHomePage,
       toWrite,
+      toAdmin,
+      getCurrSelectedKeys,
     }
   },
 
   mounted() {
+    this.getCurrSelectedKeys();
     this.initUserInfo();
   }
 }
