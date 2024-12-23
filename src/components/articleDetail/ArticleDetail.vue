@@ -46,6 +46,10 @@
                 <span>收藏: {{postLikeNum}}</span>
               </a-button>
 
+              <a-button size="large" @click="reportPost" style="margin-left: 20px;" v-if="userId!==postAuthorId">
+                <span>举报</span>
+              </a-button>
+
               <a-button v-if="userId===postAuthorId" size="large" @click="likePost" style="margin-left: auto;">
                 <DeleteOutlined/>
                 <span>删除文章</span>
@@ -75,6 +79,14 @@
           </div>
         </a-col>
 
+        <a-modal v-model:visible="isModalVisible" title="举报原因" @ok="handleSave(form)" @cancel="handleCancel">
+          <a-form :form="form" :label-col="{ span: 4 }" :wrapper-col="{ span: 14 }">
+            <a-form-item label="举报原因" :name="'user_reason'">
+              <a-input v-model:value="form.user_reason" />
+            </a-form-item>
+          </a-form>
+        </a-modal>
+
       </main>
     </a-layout-content>
   </a-layout>
@@ -84,7 +96,7 @@
 <script>
 import {LikeOutlined,LikeFilled,StarOutlined,StarFilled,DeleteOutlined} from '@ant-design/icons-vue';
 import {useApp} from "@/useApp";
-import {ref} from "vue";
+import {ref, reactive} from "vue";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
@@ -93,6 +105,7 @@ import articleService from "@/service/articleService";
 import userInfoService from "@/service/userInfoService";
 import likeFavFowService from "@/service/likeFavFowService";
 import "dayjs/locale/zh-cn";
+import reportService from "@/service/reportService";
 dayjs.locale("zh-cn");
 dayjs.extend(relativeTime);
 
@@ -182,6 +195,52 @@ export default {
       }
     };
 
+    const isModalVisible = ref(false);  // 控制弹窗显示
+    const form = reactive({
+      id: '',
+      post_id: '',
+      user_id: '',
+      user_reason: '',
+      admin_reason: '',
+      created_at: '',
+      is_handled: '',
+
+      post_title: '',
+      post_content: '',
+      user_name: '',
+    });
+    const reportPost = async() => {
+      if(store.state.isLogin){
+        try{
+          let userRes = await userInfoService.getUserInfo();
+          let userid = userRes.data.data.id;
+          if(store.id === null && userid){
+            store.commit("setId",userid);
+          }
+          form.post_id = route.params.id;
+          form.user_id = userid;
+        }catch(e){
+          console.log("获取用户信息错误: ",e);
+          proxy.$message.error("获取用户信息错误");
+        }
+      }
+      isModalVisible.value = true;  // 显示弹窗
+    };
+    const handleSave = async () => {
+      try {
+        form.is_handled = 0;
+        await reportService.addUserInfo(form);
+        isModalVisible.value = false;  // 隐藏弹窗
+        proxy.$message.success("举报成功");
+        proxy.$router.go(0); //刷新了一下界面
+      } catch (error) {
+        console.error('举报失败', error);
+      }
+    }
+    const handleCancel = () => {
+      isModalVisible.value = false;  // 隐藏弹窗
+    };
+
     return{
       postTitle,
       postContent,
@@ -199,6 +258,11 @@ export default {
       initUserInfo,
       likePost,
       follow,
+      reportPost,
+      handleSave,
+      handleCancel,
+      isModalVisible,
+      form
     }
   },
   mounted() {

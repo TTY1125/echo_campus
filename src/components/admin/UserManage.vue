@@ -64,7 +64,7 @@
 
           </a-table>
 
-        </div>>
+        </div>
 
 
     </main>
@@ -138,7 +138,6 @@ import { h, ref, reactive } from 'vue';
 import { onMounted } from 'vue';
 import {
   AppstoreOutlined,
-  SettingOutlined,
   UserOutlined,
   PieChartOutlined,
 } from '@ant-design/icons-vue';
@@ -167,65 +166,15 @@ export default {
         label: '用户管理',
       },
       {
-        key: 'sub1',
+        key: 'PostManage',
         icon: () => h(AppstoreOutlined),
-        label: 'Navigation Three',
-        title: 'Navigation Three',
+        label: '文章管理',
+        title: '文章管理',
         children: [
           {
-            key: '3',
-            label: 'Option 3',
-            title: 'Option 3',
-          },
-          {
-            key: '4',
-            label: 'Option 4',
-            title: 'Option 4',
-          },
-          {
-            key: 'sub1-2',
-            label: 'Submenu',
-            title: 'Submenu',
-            children: [
-              {
-                key: '5',
-                label: 'Option 5',
-                title: 'Option 5',
-              },
-              {
-                key: '6',
-                label: 'Option 6',
-                title: 'Option 6',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        key: 'sub2',
-        icon: () => h(SettingOutlined),
-        label: 'Navigation Four',
-        title: 'Navigation Four',
-        children: [
-          {
-            key: '7',
-            label: 'Option 7',
-            title: 'Option 7',
-          },
-          {
-            key: '8',
-            label: 'Option 8',
-            title: 'Option 8',
-          },
-          {
-            key: '9',
-            label: 'Option 9',
-            title: 'Option 9',
-          },
-          {
-            key: '10',
-            label: 'Option 10',
-            title: 'Option 10',
+            key: 'ReportManage',
+            label: '举报管理',
+            title: '举报管理',
           },
         ],
       },
@@ -237,6 +186,9 @@ export default {
     const toUserManage = () => {
       router.push('/userManage');
     };
+    const toReportManage = () => {
+      router.push('/reportManage');
+    };
     const handleClick = (event) => {
       console.log('click', event);
       if(event.key === "UserManage"){
@@ -244,6 +196,9 @@ export default {
       }
       if(event.key === "DashBoard"){
         toDashBoard();
+      }
+      if(event.key === "ReportManage"){
+        toReportManage();
       }
     };
 

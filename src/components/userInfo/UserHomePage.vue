@@ -47,6 +47,7 @@ import articleService from "@/service/articleService";
 import dayjs from "dayjs";
 import likeFavFowService from "@/service/likeFavFowService";
 import commentService from "@/service/commentService";
+import reportService from "@/service/reportService";
 export default {
   components: {PostList, IndexHeader},
   setup(){
@@ -154,7 +155,12 @@ export default {
           currPost.likeNum = postLikeNumRes.data.data;
           let commentNumRes = await commentService.getComments(0,currPost.id);
           currPost.commentNum = commentNumRes.data.data.length;
-          userPostsList.push(currPost);
+
+          let reportRes = await reportService.getFirstReportInfo(currPost.id);
+          console.log("reportRes: ",reportRes)
+          if(reportRes.data.data.is_handled !== 1){
+            userPostsList.push(currPost);
+          }
         }
         isLoading = false;
       }catch(e){
@@ -188,8 +194,9 @@ export default {
       follow,
     };
   },
-  async mounted(){
+  async mounted(userPostsList){
     this.getCurrentUserInfo();
+    userPostsList.splice(0, userPostsList.length);
     this.getMyArticles();
     window.addEventListener('scroll', this.handleScroll); // 监听滚动事件
   },
