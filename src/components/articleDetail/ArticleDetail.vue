@@ -2,7 +2,7 @@
   <a-layout id="components-layout-basic">
     <IndexHeader class="header"/>
 
-    <a-layout-content style="padding-top: 74px;;z-index: 0">
+    <a-layout-content style="padding-top: 74px;z-index: 0;">
       <main class="main-content" style="display: flex;">
         <a-col :lg="{span:14,offset:2}" :xs="{span:20,offset:2}">
 
@@ -15,7 +15,7 @@
                 <span>{{postAuthorName}}</span>
                 <span>{{postCreatedAt}}</span>
               </a-flex>
-              <a-button style="margin-left:auto" v-if="userId!==postAuthorId" @click="follow">关注</a-button>
+              <FollowButton :id="postAuthorId" v-if="userId===postAuthorId" style="margin-left: auto"/>
             </a-flex>
 
             <div class="article-content" style="width: 100%" v-if="postContent">
@@ -88,6 +88,7 @@ import {ref} from "vue";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
+import followButton from "@/components/button/FollowButton.vue";
 import articleComments from "@/components/articleDetail/ArticleComments.vue";
 import articleService from "@/service/articleService";
 import userInfoService from "@/service/userInfoService";
@@ -97,7 +98,7 @@ dayjs.locale("zh-cn");
 dayjs.extend(relativeTime);
 
 export default {
-  components: {IndexHeader,LikeOutlined,LikeFilled,articleComments,StarOutlined,StarFilled,DeleteOutlined},
+  components: {IndexHeader,LikeOutlined,LikeFilled,articleComments,StarOutlined,StarFilled,DeleteOutlined,followButton},
   setup(){
     const { route, store, proxy } = useApp();
     const isAvatarNull = ref(true);
@@ -111,7 +112,7 @@ export default {
     const postCreatedAt = ref(null);
     const postIsLiked = ref(false);
     const postLikeNum = ref(0);
-    const userId = ref('');
+    const userId = ref(-1);
 
     const gerCurrentArticle = async() =>{
       postId.value = Number(route.params.id);
@@ -145,10 +146,6 @@ export default {
           let userRes = await userInfoService.getUserInfo();
           isAvatarNull.value = false;
           avatar.value = userRes.data.data.profile_picture;
-          let userid = userRes.data.data.id;
-          if(store.id === null && userid){
-            store.commit("setId",userid);
-          }
         }catch(e){
           console.log("获取用户信息错误: ", e);
           proxy.$message.error("获取用户信息错误");

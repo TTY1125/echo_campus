@@ -9,7 +9,10 @@ const store = createStore({
     getters: {
         getId: state => {
             return state.id;
-        }
+        },
+        isLoggedIn: state => {
+            return state.isLogin;
+        },
     },
     mutations: {
         setId(state, id) {
