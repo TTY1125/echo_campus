@@ -52,6 +52,7 @@ import { ref } from "vue";
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { getCurrentInstance} from 'vue';
+import userInfoService from "@/service/userInfoService";
 
 export default {
   components: {IndexRegister},
@@ -87,22 +88,23 @@ export default {
             .then(async () => {
               try{
                 console.log("表单提交数据: ", formValues.value);
-                let res = await loginService.login(formValues.value);
+                const res = await loginService.login(formValues.value);
                 if(res.data.code===0){
                   console.log("登录成功: ", res);
                   store.commit('loginSuccess');// 通过 mutation 更新 isLogin
                   await store.dispatch('setToken', res.data.data);// 通过 action 更新 token
-                  console.log("token为: ",store.state.token);
+                  const infoRes = await userInfoService.getUserInfo();
+                  store.commit("setId",infoRes.data.data.id);//更新用户id
                   // 刷新当前页面
                   router.go(0);
                   isModalVisible.value = false;
                 }else{
                   console.log("登录失败: ", res);
-                  proxy.$message.error(res.data.message);
+                  proxy.$message.error("登录失败: ",res.data.message);
                 }
               }catch(e) {
                 console.log("登录错误: ", e);
-                proxy.$message.error(e.desc);
+                proxy.$message.error("登录错误: ",e.desc);
               }
             })
             .catch(error => {

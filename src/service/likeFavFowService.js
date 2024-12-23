@@ -45,9 +45,9 @@ export default {
         });
     },
     // 关注
-    follow(data) {
+    follow(id) {
         return new Promise((resolve, reject) => {
-            axiosInstance.post("/follow",data)
+            axiosInstance.post(`/follow/${id}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
@@ -69,9 +69,33 @@ export default {
         });
     },
     // 查看粉丝列表
+    getFollowerList(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/follow/list/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 查看自己的关注数
+    getFollowNum(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/follow/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 查看自己的关注列表
     getFollowList(id) {
         return new Promise((resolve, reject) => {
             axiosInstance.get(`/follow/list/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 查看自己是否关注这个人
+    getIfMyFollow(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/follow/followed/${id}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
