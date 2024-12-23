@@ -52,7 +52,7 @@ import articleService from "@/service/articleService";
 import dayjs from "dayjs";
 import likeFavFowService from "@/service/likeFavFowService";
 import commentService from "@/service/commentService";
-import FollowButton from "@/components/button/FollowButton.vue";
+
 export default {
   components: {FollowButton, PostList, IndexHeader, followButton},
   setup(){
@@ -138,7 +138,12 @@ export default {
           currPost.likeNum = postLikeNumRes.data.data;
           let commentNumRes = await commentService.getComments(0,currPost.id);
           currPost.commentNum = commentNumRes.data.data.length;
-          userPostsList.push(currPost);
+
+          let reportRes = await reportService.getFirstReportInfo(currPost.id);
+          console.log("reportRes: ",reportRes)
+          if(reportRes.data.data.is_handled !== 1){
+            userPostsList.push(currPost);
+          }
         }
         isLoading = false;
       }catch(e){
@@ -173,9 +178,7 @@ export default {
       handleScroll,
     };
   },
-  async mounted(){
-    await this.getCurrentUserInfo();
-    await this.getMyArticles();
+
     window.addEventListener('scroll', this.handleScroll); // 监听滚动事件
   },
   beforeUnmount() {

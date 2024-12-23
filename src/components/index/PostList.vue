@@ -3,7 +3,7 @@
     <a-list item-layout="vertical" :data-source="postsList"><!-- postsListShow传入data-source，拆解成#renderItem后给item -->
       <template #renderItem = "{ item }"><!-- a-list-item传入#renderitem，子组件（插槽）的item传入父组件 -->
         <a-list-item class="list-item" @click="goToDetail(item.id)">
-          <a-flex  style="caret-color: transparent;margin: 6px 0 6px 0">
+          <a-flex  style="caret-color: transparent;margin: 6px 0 6px 0" >
             <div class="index-post-pic" style="height: 130px;width: 180px;flex-shrink: 0;margin-right: 12px;"><!-- 一定要加上flex-shrink呀！ -->
               <img :src="item.pic" style="height: 135px;width: 180px;object-fit: cover;" alt="index_post_img" />
             </div>
