@@ -95,7 +95,7 @@ export default {
         label: '首页',
       },
       {
-        key: 'label',
+        key: 'tags',
         icon: () => h(TagOutlined),
         label: '标签',
       },
@@ -145,19 +145,14 @@ export default {
       router.push('/');
     };
     const toTags = () => {
-      router.push('/label');
+      router.push('/tags');
     };
-
-    const toAdmin = () => {
-      router.push('/admin');
-    };
-
     const handleClick = (event) => {
       console.log('click', event);
       if(event.key === "index"){
         toIndex();
       }
-      if(event.key === "label"){
+      if(event.key === "key"){
         toTags();
       }
     };
@@ -194,7 +189,6 @@ export default {
       handleClick,
       toUserHomePage,
       toWrite,
-      toAdmin,
     }
   },
 

@@ -28,10 +28,33 @@ export default {
                 .catch(err => reject(err));
         });
     },
+    addUserInfo(data) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.post("/users/addUser", data)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
     // 修改自己的用户信息
     editUserInfo(data) {
         return new Promise((resolve, reject) => {
             axiosInstance.put("/users",data)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 通过id修改其他用户的信息
+    editOtherUserInfo(id, data) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.put("/users/" + id, data)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 通过id修改其他用户的信息
+    deleteOtherUserInfo(data) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.post("/users/deleteUsers", data)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
@@ -52,5 +75,12 @@ export default {
                 .catch(err => reject(err));
         });
     },
-
+    // 通过id获取所有用户信息
+    getAllUsersInfo() {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get("/users/all")
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
 }
