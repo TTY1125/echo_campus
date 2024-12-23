@@ -27,6 +27,21 @@ const routes = [
     name: "write",
     component: () => import("@/components/write/WriteArticle.vue"),
   },
+  {
+    path: "/label",
+    name: "label",
+    component: () => import("@/components/label/LabelIndex.vue"),
+  },
+  {
+    path: "/admin",
+    name: "admin",
+    component: () => import("@/components/admin/AdminIndex.vue"),
+  },
+  {
+    path: "/userManage",
+    name: "userManage",
+    component: () => import("@/components/admin/UserManage.vue"),
+  }
 ]
 
 const router = createRouter({
