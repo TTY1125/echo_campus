@@ -52,9 +52,10 @@ import articleService from "@/service/articleService";
 import dayjs from "dayjs";
 import likeFavFowService from "@/service/likeFavFowService";
 import commentService from "@/service/commentService";
+import reportService from "@/service/reportService";
 
 export default {
-  components: {FollowButton, PostList, IndexHeader, followButton},
+  components: {PostList, IndexHeader, followButton},
   setup(){
     const {store,route,router} = useApp();
     const isSelf = ref(false);
@@ -178,7 +179,7 @@ export default {
       handleScroll,
     };
   },
-
+  async mounted(){
     window.addEventListener('scroll', this.handleScroll); // 监听滚动事件
   },
   beforeUnmount() {
