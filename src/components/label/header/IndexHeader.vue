@@ -23,7 +23,9 @@
                 </div>
               </a-flex>
 
-              <a-flex class="header-right-content" style="align-content: center"><!-- 右侧内容 -->
+              <div class="header-right-content" ><!-- 右侧内容 -->
+
+
                 <div class="header-item">
                   <a-button type="text" @click="toWrite"><EditOutlined />写文章</a-button>
                 </div>
@@ -51,7 +53,8 @@
                 <div class="header-item" v-if="$store.state.isLogin">
                   <a-button type="text" @click="logout"><LogoutOutlined />退出登录</a-button>
                 </div>
-              </a-flex>
+
+              </div>
             </a-flex>
           </a-col>
 
@@ -92,7 +95,7 @@ export default {
         label: '首页',
       },
       {
-        key: 'label',
+        key: 'tags',
         icon: () => h(TagOutlined),
         label: '标签',
       },
@@ -142,19 +145,14 @@ export default {
       router.push('/');
     };
     const toTags = () => {
-      router.push('/label');
+      router.push('/tags');
     };
-
-    const toAdmin = () => {
-      router.push('/admin');
-    };
-
     const handleClick = (event) => {
       console.log('click', event);
       if(event.key === "index"){
         toIndex();
       }
-      if(event.key === "label"){
+      if(event.key === "key"){
         toTags();
       }
     };
@@ -191,7 +189,6 @@ export default {
       handleClick,
       toUserHomePage,
       toWrite,
-      toAdmin,
     }
   },
 
