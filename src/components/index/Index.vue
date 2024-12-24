@@ -59,7 +59,7 @@ export default {
     const getIndexArticles=async()=>{
       isLoading = true;
       try{
-        const articleRes = await articleService.getArticles(currIndex);
+        const articleRes = await articleService.getUnreportedArticles(currIndex);
         currIndex+=10;
         let ret = articleRes.data.data;
         for(let i in ret){

@@ -51,4 +51,11 @@ export default {
                 .catch(err => reject(err));
         });
     },
+    notifyUser(id){
+        return new Promise((resolve, reject) => {
+            axiosInstance.get("/report/notifyUser/" + id)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
 }

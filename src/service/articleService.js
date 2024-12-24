@@ -28,6 +28,14 @@ export default {
                 .catch(err => reject(err));
         });
     },
+    // 获取未被举报成功的首页10篇文章,num是起始index
+    getUnreportedArticles(num) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get("/posts/unReportedPosts/"+num)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
     // 通过id查询文章
     getArticleById(id) {
         return new Promise((resolve, reject) => {

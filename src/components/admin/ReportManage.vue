@@ -2,21 +2,14 @@
   <a-layout id="components-layout-basic">
     <IndexHeader class="header"/>
     <main class="main-content">
-      <a-menu
-          v-model:openKeys="openKeys"
-          v-model:selectedKeys="selectedKeys"
-          class="sidebar"
-          mode="inline"
-          :items="items"
-          @click="handleClick"
-      />
+      <AdminSideBar/>
 
       <div style="margin-bottom: 16px">
         <a-button
             type="primary"
             :disabled="!hasSelected"
             :loading="state.loading"
-            @click="deleteUsers"
+            @click="deleteReports"
             style="margin-top: 16px; margin-left: 16px; width: 120px;"
         >
           删除
@@ -42,8 +35,22 @@
 
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'operation'">
-            <a @click="passReport(record)" style="margin-right: 10px;">通过</a>
-            <a @click="rejectReport(record)">拒绝</a>
+            <a
+                @click="passReport(record)"
+                :style="{
+                  marginRight: '10px',
+                  color: record.is_handled === 0? '#1890ff' : 'gray',
+                  cursor: record.is_handled === 0? 'pointer' : 'not-allowed'
+                  }"
+                :disabled="record.is_handled !== 0"
+                >通过</a>
+            <a @click="rejectReport(record)"
+               :style="{
+                  color: record.is_handled === 0 ? '#1890ff' : 'gray',
+                  cursor: record.is_handled === 0 ? 'pointer' : 'not-allowed'
+               }"
+               :disabled="record.is_handled !== 0"
+            >拒绝</a>
           </template>
         </template>
 
@@ -63,73 +70,18 @@
 </template>
 
 <script>
-import { h, ref, reactive } from 'vue';
+import { ref, reactive } from 'vue';
 import { onMounted, computed } from 'vue';
-import {
-  AppstoreOutlined,
-  UserOutlined,
-  PieChartOutlined,
-} from '@ant-design/icons-vue';
-import {useRouter} from 'vue-router';
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import reportService from "@/service/reportService"
+import AdminSideBar from "@/components/admin/AdminSideBar";
 
 export default {
   components: {
-    IndexHeader
+    IndexHeader,
+    AdminSideBar
   },
   setup(){
-    const selectedKeys = ref(['DashBoard']);
-    const openKeys = ref(['sub1']);
-    const router = useRouter();
-    const items = ref([
-      {
-        key: 'DashBoard',
-        icon: () => h(PieChartOutlined),
-        label: '仪表盘',
-      },
-      {
-        key: 'UserManage',
-        icon: () => h(UserOutlined),
-        label: '用户管理',
-      },
-      {
-        key: 'PostManage',
-        icon: () => h(AppstoreOutlined),
-        label: '文章管理',
-        title: '文章管理',
-        children: [
-          {
-            key: 'ReportManage',
-            label: '举报管理',
-            title: '举报管理',
-          },
-        ],
-      },
-    ]);
-    const toDashBoard = () => {
-      router.push('/admin');
-    };
-    const toUserManage = () => {
-      router.push('/userManage');
-    };
-    const toReportManage = () => {
-      router.push('/reportManage');
-    };
-    const handleClick = (event) => {
-      console.log('click', event);
-      if(event.key === "UserManage"){
-        toUserManage();
-      }
-      if(event.key === "DashBoard"){
-        toDashBoard();
-      }
-      if(event.key === "ReportManage"){
-        toReportManage();
-      }
-    };
-
-
     const dataSource = ref([]);
     const columns = ref([
       {
@@ -208,6 +160,7 @@ export default {
       form.post_title = record.post_title;
       form.post_content = record.post_content;
       form.user_name = record.user_name;
+      if (form.is_handled !== 0) return;
       isModalVisible.value = true;  // 显示弹窗
     };
     const handleSave = async () => {
@@ -217,6 +170,15 @@ export default {
         isModalVisible.value = false;  // 隐藏弹窗
         // 在这里重新加载数据
         await getTableData();
+
+        // // 点击通过之后，向后台通知举报人
+        // try {
+        //   await reportService.notifyUser(form.user_id);
+        //   console.log('已通知举报人');
+        // } catch (error) {
+        //   console.error('通知失败:', error);
+        // }
+
       } catch (error) {
         console.error('更新用户信息失败', error);
       }
@@ -236,7 +198,7 @@ export default {
         form.post_title = record.post_title;
         form.post_content = record.post_content;
         form.user_name = record.user_name;
-
+        if (form.is_handled !== 0) return;
         form.is_handled = 2;
         await reportService.editOtherPostInfo(form.id, form);
         // 在这里重新加载数据
@@ -253,11 +215,11 @@ export default {
       loading: false,
     });
     const hasSelected = computed(() => state.selectedRowKeys.length > 0);
-    const deleteUsers = async () => {
+    const deleteReports = async () => {
       state.loading = true;
 
       try {
-        console.log('删除选中的用户: ', state.selectedRowKeys)
+        console.log('删除选中的举报: ', state.selectedRowKeys)
         //删除选中的用户
         await reportService.deleteReports(state.selectedRowKeys);
         // 删除成功后，刷新数据
@@ -265,7 +227,7 @@ export default {
         // 清空选中的项
         state.selectedRowKeys = [];
       } catch (error) {
-        console.error('删除用户失败', error);
+        console.error('删除举报失败', error);
       } finally {
         state.loading = false;
       }
@@ -299,10 +261,7 @@ export default {
     });
 
     return {
-      selectedKeys,
-      openKeys,
-      items,
-      handleClick,
+      AdminSideBar,
       IndexHeader,
       dataSource,
       columns,
@@ -315,7 +274,7 @@ export default {
       rejectReport,
 
       hasSelected,
-      deleteUsers,
+      deleteReports,
       onSelectChange,
       state
     };
