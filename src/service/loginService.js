@@ -1,17 +1,15 @@
 import axios from "axios"
+import axiosInstance from '@/axios/axiosConfig'; // 引入配置好的 axios 实例
 
-const axiosInstance = axios.create({
+const axiosInstance1 = axios.create({ //axiosInstance带token,axiosInstance1不带
     baseURL: process.env.VUE_APP_API_BASE_URL
 });
-
-// 假设 token 已经获取并存储在 localStorage 中
-const token = localStorage.getItem('token'); // 从 localStorage 获取 token
 
 export default {
     // 注册
     register(data) {
         return new Promise((resolve, reject) => {
-            axiosInstance.post("/users/register", data)
+            axiosInstance1.post("/users/register", data)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
@@ -19,7 +17,7 @@ export default {
     // 登录
     login(data) {
         return new Promise((resolve, reject) => {
-            axiosInstance.post("/users/login", data)
+            axiosInstance1.post("/users/login", data)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
@@ -27,11 +25,7 @@ export default {
     // 退出登录
     logout() {
         return new Promise((resolve, reject) => {
-            axiosInstance.get("/users/logout", {
-                headers: {
-                    'Authorization': `${token}`,
-                },
-            })
+            axiosInstance.get("/users/logout")
                 .then(res => resolve(res))
                 .catch(err => reject(err))
         })
