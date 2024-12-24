@@ -5,7 +5,8 @@ import App from '@/components/index/Index.vue'
 const routes = [
   {
     path: '/',
-    component: App
+    name: "index",
+    component: App //组件名不能是一个单词，所以这里叫App，而不是直接import
   },
   {
     path: "/detail/:id",
