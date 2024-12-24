@@ -124,6 +124,7 @@ export default {
             lookNum: 0,
             likeNum: 0,
             commentNum: 0,
+            is_handled: ret[i].is_handled,
           };
           //查询作者信息
           try{

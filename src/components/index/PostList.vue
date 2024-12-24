@@ -9,7 +9,11 @@
             </div>
 
             <a-col class="index-post-right">
-              <div class="index-post-title">{{ item.title }}</div>
+              <div class="index-post-title">{{ item.title }}
+                <span v-if="item.is_handled" class="post-status">
+                    被举报
+                </span>
+              </div>
               <div class="index-post-content">{{ item.content }}</div>
               <a-flex class="index-post-extra" style="color: rgba(0,0,0,0.7);align-items: center">
                 <EyeOutlined style="margin-right: 6px;font-size: 20px;"/>
@@ -152,5 +156,11 @@ export default {
 }
 .list-item:hover{
   background-color: #f9f9f9;
+}
+
+.post-status {
+  font-size: 14px;
+  color: red;
+  margin-left: 10px; /* 与标题保持间距 */
 }
 </style>

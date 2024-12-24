@@ -3,14 +3,8 @@
     <IndexHeader class="header"/>
 
     <main class="main-content">
-          <a-menu
-              v-model:openKeys="openKeys"
-              v-model:selectedKeys="selectedKeys"
-              class="sidebar"
-              mode="inline"
-              :items="items"
-              @click="handleClick"
-          />
+
+        <AdminSideBar/>
 
         <div class="table-button-container">
           <a-button type="primary" @click="showAddUserModal" style="margin-top: 16px; margin-left: 16px;width: 80px;">
@@ -134,74 +128,19 @@
 </template>
 
 <script>
-import { h, ref, reactive } from 'vue';
+import { ref, reactive } from 'vue';
 import { onMounted } from 'vue';
-import {
-  AppstoreOutlined,
-  UserOutlined,
-  PieChartOutlined,
-} from '@ant-design/icons-vue';
-import {useRouter} from 'vue-router';
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import userInfoService from "@/service/userInfoService";
 import { computed } from 'vue'
+import AdminSideBar from "@/components/admin/AdminSideBar";
 
 export default {
   components: {
-    IndexHeader
+    IndexHeader,
+    AdminSideBar
   },
   setup(){
-    const selectedKeys = ref(['UserManage']);
-    const openKeys = ref(['sub1']);
-    const router = useRouter();
-    const items = ref([
-      {
-        key: 'DashBoard',
-        icon: () => h(PieChartOutlined),
-        label: '仪表盘',
-      },
-      {
-        key: 'UserManage',
-        icon: () => h(UserOutlined),
-        label: '用户管理',
-      },
-      {
-        key: 'PostManage',
-        icon: () => h(AppstoreOutlined),
-        label: '文章管理',
-        title: '文章管理',
-        children: [
-          {
-            key: 'ReportManage',
-            label: '举报管理',
-            title: '举报管理',
-          },
-        ],
-      },
-    ]);
-
-    const toDashBoard = () => {
-      router.push('/admin');
-    };
-    const toUserManage = () => {
-      router.push('/userManage');
-    };
-    const toReportManage = () => {
-      router.push('/reportManage');
-    };
-    const handleClick = (event) => {
-      console.log('click', event);
-      if(event.key === "UserManage"){
-        toUserManage();
-      }
-      if(event.key === "DashBoard"){
-        toDashBoard();
-      }
-      if(event.key === "ReportManage"){
-        toReportManage();
-      }
-    };
-
     const dataSource = ref([]);
     const columns = ref([
       // {
@@ -378,10 +317,7 @@ export default {
     });
 
     return {
-      selectedKeys,
-      openKeys,
-      items,
-      handleClick,
+      AdminSideBar,
       IndexHeader,
       dataSource,
       columns,
