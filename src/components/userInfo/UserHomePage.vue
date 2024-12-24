@@ -28,7 +28,7 @@
                   style="caret-color: transparent"/>
 
           <PostList :postsList="userPostsList" v-if="selectedKeys.includes('post')"/>
-
+          <UserList :dataList="userFollowList" v-if="selectedKeys.includes('follow')"/>
           <PostList :postsList="userFavouriteList" v-if="selectedKeys.includes('favourite')"/>
 
 
@@ -47,6 +47,7 @@ import {useApp} from "@/useApp";
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import {ProfileOutlined, HeartOutlined, StarOutlined} from "@ant-design/icons-vue";
 import PostList from "@/components/index/PostList.vue";
+import UserList from "@/components/userInfo/UserList.vue";
 import followButton from "@/components/button/FollowButton.vue";
 import articleService from "@/service/articleService";
 import dayjs from "dayjs";
@@ -55,13 +56,24 @@ import commentService from "@/service/commentService";
 // import reportService from "@/service/reportService";
 
 export default {
-  components: {PostList, IndexHeader, followButton},
+  components: {PostList, IndexHeader, followButton,UserList},
   setup(){
     const {store,route,router} = useApp();
     const isSelf = ref(false);
     let isLoading = false;
     const userPostsList = reactive([]);
-    const userFollowList = reactive([]);
+    const userFollowList = reactive([
+      {
+        id: 1,
+        username: "用户名",
+        bio:"个性签名",
+      },
+      {
+        id: 1,
+        username: "用户名",
+        bio:"个性签名",
+      }
+    ]);
     const userFavouriteList = reactive([]);
     const selectedKeys = ref(['post']);
     const userId = ref(-1);
