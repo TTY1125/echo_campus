@@ -106,7 +106,22 @@ export default {
                 .catch(err => reject(err));
         });
     },
-
+    // 查看帖子的收藏量
+    getFavouriteNum(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/favourite/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 查看我自己有没有收藏这个帖子
+    getIfMyFavourite(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.post(`/favourite/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
     // 查看自己的收藏列表
     getFavouriteList(id) {
         return new Promise((resolve, reject) => {

@@ -70,6 +70,7 @@ import IndexLogin from "@/components/index/header/IndexLogin.vue";
 import { useApp } from "@/useApp";
 import userInfoService from "@/service/userInfoService";
 import loginService from "@/service/loginService";
+import articleService from "@/service/articleService";
 
 export default {
   name: 'IndexHeader',
@@ -81,6 +82,7 @@ export default {
     const isAvatarNull = ref(true);
     const userid = ref(0);
     const avatar = ref(null);
+    const searchContentTemp = ref('');
     const items = ref([
       {
         key: 'index',
@@ -186,6 +188,15 @@ export default {
       }
     }
 
+    const onSearch = async () =>{
+      try{
+        let res = await articleService.searchPost(searchContentTemp.value);
+        console.log("搜索结果",res.data.data);
+      }catch (e) {
+        console.log("搜索错误",e);
+      }
+    }
+
     return{
       currSelectedKeys,
       indexLogin,
@@ -193,6 +204,7 @@ export default {
       isAvatarNull,
       avatar,
       userid,
+      searchContentTemp,
       showToken,
       logout,
       initUserInfo,
@@ -203,6 +215,7 @@ export default {
       toWrite,
       toAdmin,
       getCurrSelectedKeys,
+      onSearch,
     }
   },
 
