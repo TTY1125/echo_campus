@@ -253,7 +253,8 @@ export default {
           getFollowList(); // 加载更多关注
         }
         if(selectedKeys.value.includes("favourite")){
-          getFavouriteList(); // 加载更多收藏
+          //现在是获取用户的所有收藏，所以不存在获取更多
+          //getFavouriteList(); // 加载更多收藏
         }
       }
     };
@@ -278,6 +279,7 @@ export default {
     await this.getCurrentUserInfo();
     await this.getMyArticles();
     await this.getFollowList();
+    await this.getFavouriteList();
     window.addEventListener('scroll', this.handleScroll); // 监听滚动事件
   },
   beforeUnmount() {

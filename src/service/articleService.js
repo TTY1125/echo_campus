@@ -73,4 +73,12 @@ export default {
                 .catch(err => reject(err));
         });
     },
+    // 搜索
+    searchPost(keyWord) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/posts/search?keyword=${keyWord}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
 }

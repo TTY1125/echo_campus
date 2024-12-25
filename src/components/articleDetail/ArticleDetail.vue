@@ -35,15 +35,15 @@
             <!-- 文章点赞与收藏 --><!-- 两个靠左一个靠右 -->
             <a-flex style="justify-content: flex-start;">
               <a-button size="large" @click="likePost">
-                <LikeOutlined v-if="!post_is_liked"/>
-                <LikeFilled v-if="post_is_liked"/>
+                <LikeOutlined v-if="!postIsLiked"/>
+                <LikeFilled v-if="postIsLiked"/>
                 <span>点赞: {{postLikeNum}}</span>
               </a-button>
 
               <a-button size="large" @click="favouritePost" style="margin-left: 20px;">
-                <StarOutlined v-if="!post_is_liked"/>
-                <StarFilled v-if="post_is_liked"/>
-                <span>收藏: {{postLikeNum}}</span>
+                <StarOutlined v-if="!postIsFavourite"/>
+                <StarFilled v-if="postIsFavourite"/>
+                <span>收藏: {{postFavouriteNum}}</span>
               </a-button>
 
               <a-button size="large" @click="reportPost" style="margin-left: 20px;" v-if="userId!==postAuthorId">
@@ -124,7 +124,9 @@ export default {
     const postAuthorName = ref(null);
     const postCreatedAt = ref(null);
     const postIsLiked = ref(false);
+    const postIsFavourite = ref(false);
     const postLikeNum = ref(0);
+    const postFavouriteNum = ref(0);
     const userId = ref(-1);
 
     const gerCurrentArticle = async() =>{
@@ -137,8 +139,12 @@ export default {
       try{
         let ifMyLike = await likeFavFowService.getIfMyLike(postId.value,'','');
         postIsLiked.value = ifMyLike.data.data===1;
+        let ifMyFavourite = await likeFavFowService.getIfMyFavourite(postId.value,'','');
+        postIsFavourite.value = ifMyFavourite.data.data===1;
         let postLikeNumRes = await likeFavFowService.getLikeNum(postId.value,'','');
         postLikeNum.value = postLikeNumRes.data.data;
+        let postFavouriteNumRes = await likeFavFowService.getFavouriteNum(postId.value);
+        postFavouriteNum.value = postFavouriteNumRes.data.data;
         let postRes = await articleService.getArticleById(route.params.id);
         postTitle.value = postRes.data.data.title;
         postContent.value = postRes.data.data.content;
@@ -181,6 +187,23 @@ export default {
       }catch (e) {
         proxy.$message.error("点赞处理失败");
         console.log("点赞处理失败",e);
+      }
+    };
+
+    const favouritePost = async ()=>{
+      try{
+        if(!postIsFavourite.value){//点赞
+          await likeFavFowService.favourite({post_id:postId.value});
+          postIsFavourite.value = true;
+        }else{//取消点赞
+          await likeFavFowService.notFavourite(postId.value);
+          postIsFavourite.value = false;
+        }
+        let postFavouriteNumRes = await likeFavFowService.getFavouriteNum(postId.value);
+        postFavouriteNum.value = postFavouriteNumRes.data.data;
+      }catch (e) {
+        proxy.$message.error("收藏处理失败");
+        console.log("收藏处理失败",e);
       }
     };
 
@@ -243,6 +266,7 @@ export default {
       postTitle,
       postContent,
       postLikeNum,
+      postFavouriteNum,
       isAvatarNull,
       avatar,
       userId,
@@ -251,10 +275,12 @@ export default {
       postAuthorName,
       postId,
       postCreatedAt,
-      post_is_liked: postIsLiked,
+      postIsLiked,
+      postIsFavourite,
       gerCurrentArticle,
       initUserInfo,
       likePost,
+      favouritePost,
       follow,
       reportPost,
       handleSave,
