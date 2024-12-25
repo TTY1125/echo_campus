@@ -10,10 +10,10 @@
             <span style="font-weight: bold;font-size: 32px;display: flex;">{{postTitle}}</span>
 
             <a-flex style="margin-top: 10px;justify-content: flex-start;">
-              <a-avatar :src="postAuthorAvatar" :size="48"/>
-              <a-flex vertical="vertical">
-                <span>{{postAuthorName}}</span>
-                <span>{{postCreatedAt}}</span>
+              <a-avatar :src="postAuthorAvatar" :size="46"/>
+              <a-flex vertical="vertical" style="justify-content: space-between;text-align: start;margin-left: 10px">
+                <span style="font-size: 19px">{{postAuthorName}}</span>
+                <span style="font-size: 14px">{{postCreatedAt}}</span>
               </a-flex>
               <FollowButton :id="postAuthorId" v-if="userId===postAuthorId" style="margin-left: auto"/>
             </a-flex>
@@ -142,10 +142,11 @@ export default {
         let postRes = await articleService.getArticleById(route.params.id);
         postTitle.value = postRes.data.data.title;
         postContent.value = postRes.data.data.content;
+        postCreatedAt.value = dayjs(postRes.data.data.created_at).format('YYYY-MM-DD HH:mm:ss');
         postAuthorId.value = postRes.data.data.user_id;
-        postAuthorName.value = postRes.data.data.username;
-        postAuthorAvatar.value = postRes.data.data.profile_picture;
-        postCreatedAt.value = postRes.data.data.created_at;
+        let userRes = await userInfoService.getOtherUserInfo(postAuthorId.value);
+        postAuthorName.value = userRes.data.data.username;
+        postAuthorAvatar.value = userRes.data.data.profile_picture;
         userId.value = store.getters.getId;
       }catch (e) {
         proxy.$message.error("获取文章信息出错");

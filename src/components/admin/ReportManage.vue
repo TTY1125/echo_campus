@@ -4,57 +4,59 @@
     <main class="main-content">
       <AdminSideBar/>
 
-      <div style="margin-bottom: 16px">
-        <a-button
-            type="primary"
-            :disabled="!hasSelected"
-            :loading="state.loading"
-            @click="deleteReports"
-            style="margin-top: 16px; margin-left: 16px; width: 120px;"
+      <a-flex vertical="vertical">
+        <a-flex style="margin: 10px 0">
+          <a-button danger
+                    type="primary"
+                    :disabled="!hasSelected"
+                    :loading="state.loading"
+                    @click="deleteReports"
+                    style="margin-left: 16px;"
+          >
+            删除
+            <span style="margin-left: 8px" v-if="hasSelected">
+                  {{ `已选中 ${state.selectedRowKeys.length} 项` }}
+                </span>
+          </a-button>
+        </a-flex>
+
+
+        <a-table class="table-content"
+                 :dataSource="dataSource"
+                 :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+                 :row-key="record => record.id"
+                 :pagination="{ pageSize : 10}"
+                 :columns="columns"
+                 :scroll="{y : 500}"
         >
-          删除
-        </a-button>
-        <span style="margin-left: 8px">
-              <template v-if="hasSelected">
-                {{ `已选中 ${state.selectedRowKeys.length} 项` }}
-              </template>
-            </span>
-      </div>
+          <template #is_handled="{ record }">
+            {{ record.is_handled === 0? "待处理" : (record.is_handled === 1? "已审核通过" : (record.is_handled === 2? "已驳回" : "未知状态")) }}
+          </template>
 
-      <a-table class="table-content"
-               :dataSource="dataSource"
-               :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
-               :row-key="record => record.id"
-               :pagination="{ pageSize : 10}"
-               :columns="columns"
-               :scroll="{y : 500}"
-      >
-        <template #is_handled="{ record }">
-          {{ record.is_handled === 0? "待处理" : (record.is_handled === 1? "已审核通过" : (record.is_handled === 2? "已驳回" : "未知状态")) }}
-        </template>
-
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'operation'">
-            <a
-                @click="passReport(record)"
-                :style="{
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'operation'">
+              <a
+                  @click="passReport(record)"
+                  :style="{
                   marginRight: '10px',
                   color: record.is_handled === 0? '#1890ff' : 'gray',
                   cursor: record.is_handled === 0? 'pointer' : 'not-allowed'
                   }"
-                :disabled="record.is_handled !== 0"
-                >通过</a>
-            <a @click="rejectReport(record)"
-               :style="{
+                  :disabled="record.is_handled !== 0"
+              >通过</a>
+              <a @click="rejectReport(record)"
+                 :style="{
                   color: record.is_handled === 0 ? '#1890ff' : 'gray',
                   cursor: record.is_handled === 0 ? 'pointer' : 'not-allowed'
                }"
-               :disabled="record.is_handled !== 0"
-            >拒绝</a>
+                 :disabled="record.is_handled !== 0"
+              >拒绝</a>
+            </template>
           </template>
-        </template>
 
-      </a-table>
+        </a-table>
+      </a-flex>
+
     </main>
 
     <a-modal v-model:visible="isModalVisible" title="举报通过原因" @ok="handleSave(form)" @cancel="handleCancel">
@@ -75,6 +77,7 @@ import { onMounted, computed } from 'vue';
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import reportService from "@/service/reportService"
 import AdminSideBar from "@/components/admin/AdminSideBar";
+import dayjs from "dayjs";
 
 export default {
   components: {
@@ -250,6 +253,9 @@ export default {
       try {
         const response = await reportService.getAllReportsInfo();
         dataSource.value = response.data.data;
+        for(let i in dataSource.value){
+          dataSource.value[i].created_at = dayjs(dataSource.value[i].created_at).format('YYYY-MM-DD HH:mm:ss');
+        }
         console.log("所有举报的信息:", dataSource);
         isLoading.value = false;
       } catch (error) {
@@ -305,16 +311,6 @@ export default {
   flex-grow: 1;
   display: flex; /* 左右布局 */
   background: #f5f5f5;
-}
-
-/* 左侧侧边栏 */
-.sidebar {
-  width: 256px;
-  flex-shrink: 0; /* 固定宽度 */
-  background: #fff;
-  border-right: 1px solid #e8e8e8;
-  height: calc(100vh - 64px); /* 减去 Header 的高度 */
-  overflow: auto;
 }
 
 /* 右侧表格内容 */
