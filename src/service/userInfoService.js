@@ -40,7 +40,7 @@ export default {
                 .catch(err => reject(err));
         });
     },
-    // 通过id修改其他用户的信息
+    // 通过id删除其他用户的信息
     deleteOtherUserInfo(data) {
         return new Promise((resolve, reject) => {
             axiosInstance.post("/users/deleteUsers", data)

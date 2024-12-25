@@ -4,7 +4,10 @@
       <a-layout-content>
         <main class="main-content">
             <AdminSideBar/>
+
+          <WebSocketExample/>
         </main>
+
       </a-layout-content>
   </a-layout>
 </template>
@@ -12,16 +15,19 @@
 <script>
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import AdminSideBar from "@/components/admin/AdminSideBar";
+import WebSocketExample from "@/components/message/messageDefine.vue"
 
 export default {
   components: {
     IndexHeader,
-    AdminSideBar
+    AdminSideBar,
+    WebSocketExample
   },
   setup(){
     return {
       IndexHeader,
       AdminSideBar,
+      WebSocketExample,
     };
   },
   name: "AdminIndex"

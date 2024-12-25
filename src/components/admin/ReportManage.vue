@@ -198,6 +198,7 @@ export default {
         form.post_title = record.post_title;
         form.post_content = record.post_content;
         form.user_name = record.user_name;
+        form.is_handled = record.is_handled;
         if (form.is_handled !== 0) return;
         form.is_handled = 2;
         await reportService.editOtherPostInfo(form.id, form);

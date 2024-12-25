@@ -18,6 +18,16 @@
               <FollowButton :id="postAuthorId" v-if="userId===postAuthorId" style="margin-left: auto"/>
             </a-flex>
 
+            <a-row style="margin-top: 10px;">
+              <span style="font-weight: bold; margin-right: 8px;">标签:</span> <!-- 标签前的文本 -->
+              <a-col v-for="(label, index) in postLabels" :key="index" style="margin-right: 8px;">
+                <a-tag color="blue"
+                       @click="handleLabelClick(label)"
+                       :style="{cursor: 'pointer'}"
+                >{{ label.label_name }}</a-tag>
+              </a-col>
+            </a-row>
+
             <div class="article-content" style="width: 100%" v-if="postContent">
               <mavon-editor
                   v-model="postContent"
@@ -107,6 +117,8 @@ import userInfoService from "@/service/userInfoService";
 import likeFavFowService from "@/service/likeFavFowService";
 import "dayjs/locale/zh-cn";
 import reportService from "@/service/reportService";
+import labelService from "@/service/labelService";
+import {useRouter} from 'vue-router';
 dayjs.locale("zh-cn");
 dayjs.extend(relativeTime);
 
@@ -126,6 +138,8 @@ export default {
     const postIsLiked = ref(false);
     const postLikeNum = ref(0);
     const userId = ref(-1);
+    const postLabels = reactive([]);
+    const router = useRouter();
 
     const gerCurrentArticle = async() =>{
       postId.value = Number(route.params.id);
@@ -147,6 +161,22 @@ export default {
         postAuthorAvatar.value = postRes.data.data.profile_picture;
         postCreatedAt.value = postRes.data.data.created_at;
         userId.value = store.getters.getId;
+
+        //获取标签数据
+        const labelRes = await labelService.getLabelOfPost(postId.value);
+        let ret = labelRes.data.data;
+        console.log("labels: ", ret);
+        for(let i in ret) {
+          let currLabel = {
+            id: ret[i].id,
+            label_name: ret[i].label_name,
+            description: ret[i].description,
+            label_icon: ret[i].label_icon,
+            created_at: dayjs(ret[i].created_at),
+          };
+          postLabels.push(currLabel);
+        }
+
       }catch (e) {
         proxy.$message.error("获取文章信息出错");
         console.log("获取文章信息出错",e);
@@ -237,7 +267,9 @@ export default {
     const handleCancel = () => {
       isModalVisible.value = false;  // 隐藏弹窗
     };
-
+    const handleLabelClick = (label) => {
+      router.push('/label/' + label.id);
+    }
     return{
       postTitle,
       postContent,
@@ -259,7 +291,9 @@ export default {
       handleSave,
       handleCancel,
       isModalVisible,
-      form
+      form,
+      postLabels,
+      handleLabelClick
     }
   },
   mounted() {

@@ -4,7 +4,7 @@
 
     <a-layout-content>
       <main class="main-content">
-        <LabelContent :data="labelListShow"/>
+        <LabelContent :data="indexLabelsList"/>
       </main>
     </a-layout-content>
 
@@ -15,55 +15,35 @@
 <script>
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import LabelContent from "@/components/label/LabelContent";
-// import labelService from "@/service/labelService";
-import {ref} from "vue";
-// import dayjs from "dayjs";
+import labelService from "@/service/labelService";
+import { reactive} from "vue";
+import dayjs from "dayjs";
 export default {
   components:{
     IndexHeader,
     LabelContent,
   },
   setup(){
-    // let currIndex = 0;
+    let currIndex = 0;
     let isLoading = false;
+    const indexLabelsList = reactive([]);
 
-    const labelListShow = ref([
-      {
-        id: 4,
-        labelName: 'Vue.js',
-        logo: require('@/assets/img/img.png')
-      },
-      {
-        id: 5,
-        labelName: 'Kubernetes',
-        logo: require('@/assets/img/img.png')
-      },
-      {
-        id: 6,
-        labelName: 'Docker',
-        logo: require('@/assets/img/img.png')
-      },
-      {
-        id: 8,
-        labelName: 'Spring Boot',
-        logo: require('@/assets/img/img.png')
-      },
-    ]);
-
-    // 获取标签方法
+    // 获取所有标签
     const getLabelList = async () => {
       isLoading = true;
       try{
-        // const labelRes = await labelService.getLabelList(currIndex);
-        // currIndex+=10;
-        // let ret = labelRes.data.data;
-        // for(let i in ret){
-        //   let currLabel = {
-        //     id: ret[i].id,
-        //     labelName: ret[i].labelName,
-        //     created_at: dayjs(ret[i].created_at),
-        //     avatar: null,
-        //   };
+        const labelRes = await labelService.getAllLabelsInfo(currIndex);
+        currIndex+=20;
+        let ret = labelRes.data.data;
+        for(let i in ret){
+          let currLabel = {
+            id: ret[i].id,
+            label_name: ret[i].label_name,
+            description: ret[i].description,
+            label_icon: ret[i].label_icon,
+            created_at: dayjs(ret[i].created_at),
+            post_num: ret[i].post_num,
+          };
           // //查询浏览量，点赞量和评论量
           // let postLikeNumRes = await likeFavFowService.getLikeNum(currPost.id,'','');
           // currPost.likeNum = postLikeNumRes.data.data;
@@ -72,9 +52,9 @@ export default {
           // //查询封面图片
           // let picRes = await articleService.getPostPic(currPost.id);
           // currPost.pic = picRes.data.data;
-          // indexPostsList.push(currPost);
-        // }
-        // isLoading = false;
+          indexLabelsList.push(currLabel);
+        }
+        isLoading = false;
       }catch(e){
         console.log("获取标签错误",e);
       }
@@ -95,7 +75,7 @@ export default {
     return{
       handleScroll,
       getLabelList,
-      labelListShow
+      indexLabelsList
     }
   },
   mounted() {

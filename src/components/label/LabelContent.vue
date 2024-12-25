@@ -6,10 +6,12 @@
         <a-badge class="info-box"
                  v-for="item of data" :key="item.id">
           <div>
-            <a-avatar class="avatar" :size="60" :src="item.logo" @click="routerLabelToArticle(item.id)" style="cursor: pointer"/>
+            <a-avatar class="avatar" :size="60" :src="item.label_icon" @click="routerLabelToArticle(item.id)" style="cursor: pointer"/>
           </div>
-          <div class="title" @click="routerLabelToArticle(item.id)">{{ item.labelName }}</div>
-<!--          <div class="meta-article">{{ item.articleUseCount + ' ' + $t('common.article') }}</div>-->
+          <div class="title" @click="routerLabelToArticle(item.id)">{{ item.label_name }}</div>
+          <div class="article-count">
+            {{ item.post_num || 0 }} 篇文章
+          </div>
         </a-badge>
       </div>
     </div>
@@ -30,14 +32,8 @@ export default {
       type: Array,
       default: () => []
     },
-    searchContent: {
-      type: String,
-      default: ''
-    }
   },
   setup(){
-// 创建响应式数据
-//     const searchContentTemp = ref(props.searchContent);
     const labelAddVisible = ref(false);
     const labelEditVisible = ref({});
 
@@ -52,7 +48,7 @@ export default {
 
 // 路由到标签文章页面方法
     const routerLabelToArticle = (labelId) => {
-      router.push('/label/'+labelId.value);
+      router.push('/label/'+labelId);
     };
 
     return {

@@ -46,6 +46,11 @@ export default {
             label: '举报管理',
             title: '举报管理',
           },
+          {
+            key: 'LabelManage',
+            label: '标签管理',
+            title: '标签管理',
+          },
         ],
       },
     ]);
@@ -60,6 +65,9 @@ export default {
       console.log('route')
       router.push('/reportManage');
     };
+    const toLabelManage = () => {
+      router.push('/labelManage');
+    };
 
     // 根据路由更新选中项
     watchEffect(() => {
@@ -67,6 +75,7 @@ export default {
         '/admin': 'DashBoard',
         '/userManage': 'UserManage',
         '/reportManage': 'ReportManage',
+        '/labelManage': 'LabelManage',
       };
       selectedKeys.value = [pathMap[route.path] || 'DashBoard'];
     });
@@ -82,6 +91,9 @@ export default {
       }
       if(event.key === "ReportManage"){
         toReportManage();
+      }
+      if(event.key === "LabelManage"){
+        toLabelManage();
       }
     };
 
