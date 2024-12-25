@@ -61,7 +61,6 @@
   </a-layout>
 </template>
 
-
 <script>
 import { h, ref } from 'vue';
 import { HomeOutlined, TagOutlined , InfoCircleOutlined,
@@ -70,7 +69,6 @@ import IndexLogin from "@/components/index/header/IndexLogin.vue";
 import { useApp } from "@/useApp";
 import userInfoService from "@/service/userInfoService";
 import loginService from "@/service/loginService";
-import articleService from "@/service/articleService";
 
 export default {
   name: 'IndexHeader',
@@ -94,11 +92,11 @@ export default {
         icon: () => h(TagOutlined),
         label: '标签',
       },
-       {
-         key: 'about',
-         icon: () => h(InfoCircleOutlined),
-         label: '关于',
-       },
+      {
+        key: 'about',
+        icon: () => h(InfoCircleOutlined),
+        label: '关于',
+      },
     ]);
     const showToken = ()=>{
       proxy.$message.info(store.state.token,0.5)
@@ -188,12 +186,16 @@ export default {
       }
     }
 
-    const onSearch = async () =>{
-      try{
-        let res = await articleService.searchPost(searchContentTemp.value);
-        console.log("搜索结果",res.data.data);
-      }catch (e) {
-        console.log("搜索错误",e);
+    const onSearch = () =>{
+      router.push({path: "/search", query: {query: searchContentTemp.value}});
+      if(route.name === 'search'){
+        // 获取当前的 URL 和查询参数
+        const url = new URL(window.location.href);
+        // 更新查询参数
+        url.searchParams.set('query', searchContentTemp.value);  // 你希望设置的新查询参数
+        // 更新 URL，并刷新页面
+        window.history.replaceState(null, '', url.href);  // 更新浏览器的历史记录
+        location.reload();  // 强制刷新页面
       }
     }
 

@@ -47,7 +47,12 @@ const routes = [
     path: "/reportManage",
     name: "reportManage",
     component: () => import("@/components/admin/ReportManage.vue"),
-  }
+  },
+  {
+    path: "/search",
+    name: "search",
+    component: () => import("@/components/index/IndexSearch.vue"),
+  },
 ]
 
 const router = createRouter({

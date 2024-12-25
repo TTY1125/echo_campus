@@ -180,7 +180,7 @@ export default {
           let currUser = userRes.data.data;
           userFollowList.push(currUser);
         }
-        userFollowListOffset++;
+        userFollowListOffset+=10;
       }catch (e) {
         proxy.$message.error("获取关注列表失败");
       }
