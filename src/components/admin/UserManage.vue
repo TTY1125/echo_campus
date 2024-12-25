@@ -1,64 +1,61 @@
 <template>
   <a-layout id="components-layout-basic">
     <IndexHeader class="header"/>
-
     <main class="main-content">
+      <AdminSideBar/>
 
-        <AdminSideBar/>
+      <div class="table-button-container">
 
-        <div class="table-button-container">
-          <a-button type="primary" @click="showAddUserModal" style="margin-top: 16px; margin-left: 16px;width: 80px;">
+        <a-flex style="margin:10px 0">
+          <a-button type="primary" @click="showAddUserModal" style="margin-left: 16px;">
             新增用户
           </a-button>
-
-          <div style="margin-bottom: 16px">
-            <a-button
-                type="primary"
-                :disabled="!hasSelected"
-                :loading="state.loading"
-                @click="deleteUsers"
-                style="margin-top: 16px; margin-left: 16px; width: 120px;"
-            >
-              删除
-            </a-button>
-            <span style="margin-left: 8px">
-              <template v-if="hasSelected">
-                {{ `已选中 ${state.selectedRowKeys.length} 项` }}
-              </template>
-            </span>
-          </div>
-
-          <a-table class="table-content"
-                   :dataSource="dataSource"
-                   :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
-                   :row-key="record => record.id"
-                   :pagination="{ pageSize : 10}"
-                   :columns="columns"
-                   :scroll="{y : 500}"
+          <a-button danger
+              type="primary"
+              :disabled="!hasSelected"
+              :loading="state.loading"
+              @click="deleteUsers"
+              style="margin-left: 16px;"
           >
-            <template #profile_picture="{ record }">
-              <img :src="
+            删除
+            <span style="margin-left: 8px" v-if="hasSelected">
+                  {{ `已选中 ${state.selectedRowKeys.length} 项` }}
+                </span>
+          </a-button>
+        </a-flex>
+
+        <a-table class="table-content"
+                 :dataSource="dataSource"
+                 :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }"
+                 :row-key="record => record.id"
+                 :pagination="{ pageSize : 10}"
+                 :columns="columns"
+                 :scroll="{y : 500}"
+        >
+
+          <template #profile_picture="{ record }">
+            <img :src="
               record.profile_picture ? record.profile_picture : require('@/assets/img/default_avatar2.jpg')"
-                   alt="Profile Picture"
-                   style="width: 50px; height: 50px; border-radius: 50%;"
-              />
-            </template>
-            <!--            <template v-slot:num="slotProps">-->
-            <!--              {{(current - 1 ) * pageSize + slotProps.index + 1}}-->
-            <!--            </template>>-->
-            <template #is_admin="{ record }">
-              {{record.is_admin ? "管理员" : "用户"}}
-            </template>
+                 alt="Profile Picture"
+                 style="width: 50px; height: 50px; border-radius: 50%;"
+            />
+          </template>
+          <!--            <template v-slot:num="slotProps">-->
+          <!--              {{(current - 1 ) * pageSize + slotProps.index + 1}}-->
+          <!--            </template>>-->
+          <template #is_admin="{ record }">
+            {{record.is_admin ? "管理员" : "用户"}}
+          </template>
 
-            <template #bodyCell="{ column, record }">
-              <template v-if="column.key === 'operation'">
-                <a @click="editUser(record)">编辑</a>
-              </template>
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.key === 'operation'">
+              <a @click="editUser(record)">编辑</a>
             </template>
+          </template>
 
-          </a-table>
+        </a-table>
 
-        </div>
+      </div>
 
 
     </main>
@@ -78,10 +75,10 @@
           <a-input v-model:value="form.bio" />
         </a-form-item>
         <a-form-item label="头像" :name="'profile_picture'">
-            <img :src="form.profile_picture ? form.profile_picture : require('@/assets/img/default_avatar2.jpg')"
-                 alt="头像"
-                 style="width: 50px; height: 50px; border-radius: 50%;"
-            />
+          <img :src="form.profile_picture ? form.profile_picture : require('@/assets/img/default_avatar2.jpg')"
+               alt="头像"
+               style="width: 50px; height: 50px; border-radius: 50%;"
+          />
         </a-form-item>
         <a-form-item label="权限" :name="'is_admin'">
           <a-select v-model:value="form.is_admin" :placeholder="'请选择权限'" style="width: 100%">
@@ -134,6 +131,7 @@ import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import userInfoService from "@/service/userInfoService";
 import { computed } from 'vue'
 import AdminSideBar from "@/components/admin/AdminSideBar";
+import dayjs from "dayjs";
 
 export default {
   components: {
@@ -276,11 +274,11 @@ export default {
       try {
         console.log('删除选中的用户: ', state.selectedRowKeys)
         //删除选中的用户
-         await userInfoService.deleteOtherUserInfo(state.selectedRowKeys);
+        await userInfoService.deleteOtherUserInfo(state.selectedRowKeys);
         // 删除成功后，刷新数据
-         await getTableData();
+        await getTableData();
         // 清空选中的项
-         state.selectedRowKeys = [];
+        state.selectedRowKeys = [];
       } catch (error) {
         console.error('删除用户失败', error);
       } finally {
@@ -306,6 +304,9 @@ export default {
       try {
         const response = await userInfoService.getAllUsersInfo();
         dataSource.value = response.data.data;
+        for(let i in dataSource.value){
+          dataSource.value[i].created_at = dayjs(dataSource.value[i].created_at).format('YYYY-MM-DD HH:mm:ss');
+        }
         isLoading.value = false;
       } catch (error) {
         console.error('获取用户信息错误', error);
@@ -368,16 +369,6 @@ export default {
   flex-grow: 1;
   display: flex; /* 左右布局 */
   background: #f5f5f5;
-}
-
-/* 左侧侧边栏 */
-.sidebar {
-  width: 256px;
-  flex-shrink: 0; /* 固定宽度 */
-  background: #fff;
-  border-right: 1px solid #e8e8e8;
-  height: calc(100vh - 64px); /* 减去 Header 的高度 */
-  overflow: auto;
 }
 
 /* 右侧表格内容 */
