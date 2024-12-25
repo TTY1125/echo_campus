@@ -9,13 +9,13 @@
           <div class="title_content" style="background-color: white;padding: 20px 30px;">
             <span style="font-weight: bold;font-size: 32px;display: flex;">{{postTitle}}</span>
 
-            <a-flex style="margin-top: 10px;justify-content: flex-start;">
+            <a-flex style="margin-top: 10px;justify-content: flex-start">
               <a-avatar :src="postAuthorAvatar" :size="46"/>
               <a-flex vertical="vertical" style="justify-content: space-between;text-align: start;margin-left: 10px">
                 <span style="font-size: 19px">{{postAuthorName}}</span>
                 <span style="font-size: 14px">{{postCreatedAt}}</span>
               </a-flex>
-              <FollowButton :id="postAuthorId" v-if="userId===postAuthorId" style="margin-left: auto"/>
+              <FollowButton :id="postAuthorId" v-if="userId!==postAuthorId" style="margin-left: auto;align-self: center"/>
             </a-flex>
 
             <div class="article-content" style="width: 100%" v-if="postContent">
@@ -40,7 +40,7 @@
                 <span>点赞: {{postLikeNum}}</span>
               </a-button>
 
-              <a-button size="large" @click="likePost" style="margin-left: 20px;">
+              <a-button size="large" @click="favouritePost" style="margin-left: 20px;">
                 <StarOutlined v-if="!post_is_liked"/>
                 <StarFilled v-if="post_is_liked"/>
                 <span>收藏: {{postLikeNum}}</span>
@@ -100,7 +100,7 @@ import {ref, reactive} from "vue";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
-import followButton from "@/components/button/FollowButton.vue";
+import FollowButton from "@/components/button/FollowButton.vue";
 import articleComments from "@/components/articleDetail/ArticleComments.vue";
 import articleService from "@/service/articleService";
 import userInfoService from "@/service/userInfoService";
@@ -111,7 +111,7 @@ dayjs.locale("zh-cn");
 dayjs.extend(relativeTime);
 
 export default {
-  components: {IndexHeader,LikeOutlined,LikeFilled,articleComments,StarOutlined,StarFilled,DeleteOutlined,followButton},
+  components: {IndexHeader,LikeOutlined,LikeFilled,articleComments,StarOutlined,StarFilled,DeleteOutlined,FollowButton},
   setup(){
     const { route, store, proxy } = useApp();
     const isAvatarNull = ref(true);

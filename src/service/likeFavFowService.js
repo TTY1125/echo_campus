@@ -34,9 +34,9 @@ export default {
         });
     },
     // 关注
-    follow(id) {
+    follow(data) {
         return new Promise((resolve, reject) => {
-            axiosInstance.post(`/follow/${id}`)
+            axiosInstance.post('/follow',data)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
@@ -74,9 +74,9 @@ export default {
         });
     },
     // 查看自己的关注列表
-    getFollowList(id) {
+    getFollowList(id,offset) {
         return new Promise((resolve, reject) => {
-            axiosInstance.get(`/follow/list/${id}`)
+            axiosInstance.get(`/follow/followed/list?id=${id}&offset=${offset}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
@@ -84,7 +84,33 @@ export default {
     // 查看自己是否关注这个人
     getIfMyFollow(id) {
         return new Promise((resolve, reject) => {
-            axiosInstance.get(`/follow/followed/${id}`)
+            axiosInstance.post(`/follow/followed/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+
+    // 收藏
+    favourite(data) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.post('/favourite',data)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+    // 取消收藏
+    notFavourite(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.delete(`/favourite/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
+
+    // 查看自己的收藏列表
+    getFavouriteList(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.get(`/favourite/users/${id}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
