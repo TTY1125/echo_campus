@@ -1,11 +1,12 @@
 <template>
-  <!-- 是否显示（isSelf）的逻辑放父组件，关注和已关注的切换在本文件 -->
-  <a-button style="margin-right: 20px" v-if="!isFollow" @click="follow">关注</a-button>
-  <a-button style="margin-right: 20px;color: rgb(0,0,0,0.5)" v-if="isFollow" @click="notFollow">已关注</a-button>
+  <div><!-- 用div来获取父组件的样式 -->
+    <!-- 是否显示（isSelf）的逻辑放父组件，关注和已关注的切换在本文件 -->
+    <a-button v-if="!isFollow" @click.stop="follow">关注</a-button>
+    <a-button style="color: rgb(0,0,0,0.5)" v-if="isFollow" @click.stop="notFollow">已关注</a-button>
+  </div>
 </template>
 
 <script>
-
 import likeFavFowService from "@/service/likeFavFowService";
 import {ref} from "vue";
 import {useApp} from "@/useApp";
@@ -22,7 +23,8 @@ export default {
     const isFollow = ref(false);//是否已经关注
     const follow = async () =>{
       try {
-        await likeFavFowService.follow(props.id);
+        let data = {followed_id:props.id};
+        await likeFavFowService.follow(data);
         proxy.$message.success("关注成功");
         isFollow.value = true;
       }catch (e) {
@@ -39,11 +41,13 @@ export default {
       }
     };
     const getIfIsFollow = async () =>{
-      try {
-        const res = await likeFavFowService.getIfMyFollow(props.id);
-        isFollow.value = res.data.data;//???
-      }catch (e) {
-        proxy.$message.error("获取是否关注失败");
+      if(props.id!==-1){
+        try {
+          const res = await likeFavFowService.getIfMyFollow(props.id);
+          isFollow.value = res.data.data===1;
+        }catch (e) {
+          proxy.$message.error("获取是否关注失败");
+        }
       }
     };
     return {
@@ -53,8 +57,8 @@ export default {
       getIfIsFollow,
     }
   },
-  mounted() {
-    this.getIfIsFollow();
+  async mounted() {
+    await this.getIfIsFollow();
   }
 }
 
