@@ -53,7 +53,53 @@
               >拒绝</a>
             </template>
           </template>
-
+          <template
+              #customFilterDropdown="{ setSelectedKeys, selectedKeys, confirm, clearFilters, column }"
+          >
+            <div style="padding: 8px">
+              <a-input
+                  ref="searchInput"
+                  :placeholder="`Search ${column.dataIndex}`"
+                  :value="selectedKeys[0]"
+                  style="width: 188px; margin-bottom: 8px; display: block"
+                  @change="e => setSelectedKeys(e.target.value ? [e.target.value] : [])"
+                  @pressEnter="handleSearch(selectedKeys, confirm, column.dataIndex)"
+              />
+              <a-button
+                  type="primary"
+                  size="small"
+                  style="width: 90px; margin-right: 8px"
+                  @click="handleSearch(selectedKeys, confirm, column.dataIndex)"
+              >
+                <template #icon><SearchOutlined /></template>
+                Search
+              </a-button>
+              <a-button size="small" style="width: 90px" @click="handleReset(clearFilters)">
+                Reset
+              </a-button>
+            </div>
+          </template>
+          <template #customFilterIcon="{ filtered }">
+            <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
+          </template>
+          <template #bodyCell2="{ text, column }">
+      <span v-if="state.searchText && state.searchedColumn === column.dataIndex">
+        <template
+            v-for="(fragment, i) in text
+            .toString()
+            .split(new RegExp(`(?<=${state.searchText})|(?=${state.searchText})`, 'i'))"
+        >
+          <mark
+              v-if="fragment.toLowerCase() === state.searchText.toLowerCase()"
+              :key="i"
+              class="highlight"
+          >
+            {{ fragment }}
+          </mark>
+          <template v-else>{{ fragment }}</template>
+        </template>
+      </span>
+          </template>
         </a-table>
       </a-flex>
 
@@ -78,14 +124,22 @@ import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import reportService from "@/service/reportService"
 import AdminSideBar from "@/components/admin/AdminSideBar";
 import dayjs from "dayjs";
+import { SearchOutlined } from '@ant-design/icons-vue';
+import { nextTick } from 'vue';
 
 export default {
   components: {
     IndexHeader,
-    AdminSideBar
+    AdminSideBar,
+    SearchOutlined
   },
   setup(){
     const dataSource = ref([]);
+    const state2 = reactive({
+      searchText: '',
+      searchedColumn: '',
+    });
+    const searchInput = ref();
     const columns = ref([
       {
         title: 'ID',
@@ -96,26 +150,86 @@ export default {
         title: '文章标题',
         dataIndex: 'post_title',
         key: 'post_title',
+        customFilterDropdown: true,
+        onFilter: (value, record) => record.post_title.toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: visible => {
+          if (visible) {
+            setTimeout(() => {
+              console.log('visible', searchInput);
+              nextTick(() => {
+                searchInput.value?.focus();
+              });
+            }, 100);
+          }
+        },
       },
       {
         title: '文章内容',
         dataIndex: 'post_content',
         key: 'post_content',
+        customFilterDropdown: true,
+        onFilter: (value, record) => record.post_content.toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: visible => {
+          if (visible) {
+            setTimeout(() => {
+              console.log('visible', searchInput);
+              nextTick(() => {
+                searchInput.value?.focus();
+              });
+            }, 100);
+          }
+        },
       },
       {
         title: '举报人姓名',
         dataIndex: 'user_name',
         key: 'user_name',
+        customFilterDropdown: true,
+        onFilter: (value, record) => record.user_name.toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: visible => {
+          if (visible) {
+            setTimeout(() => {
+              console.log('visible', searchInput);
+              nextTick(() => {
+                searchInput.value?.focus();
+              });
+            }, 100);
+          }
+        },
       },
       {
         title: '用户举报原因',
         dataIndex: 'user_reason',
         key: 'user_reason',
+        customFilterDropdown: true,
+        onFilter: (value, record) => record.user_reason.toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: visible => {
+          if (visible) {
+            setTimeout(() => {
+              console.log('visible', searchInput);
+              nextTick(() => {
+                searchInput.value?.focus();
+              });
+            }, 100);
+          }
+        },
       },
       {
         title: '举报通过说明',
         dataIndex: 'admin_reason',
         key: 'admin_reason',
+        customFilterDropdown: true,
+        onFilter: (value, record) => record.admin_reason.toString().toLowerCase().includes(value.toLowerCase()),
+        onFilterDropdownOpenChange: visible => {
+          if (visible) {
+            setTimeout(() => {
+              console.log('visible', searchInput);
+              nextTick(() => {
+                searchInput.value?.focus();
+              });
+            }, 100);
+          }
+        },
       },
       {
         title: '举报时间',
@@ -137,6 +251,19 @@ export default {
         width: 100,
       },
     ]);
+
+
+    const handleSearch = (selectedKeys, confirm, dataIndex) => {
+      confirm();
+      state2.searchText = selectedKeys[0];
+      state2.searchedColumn = dataIndex;
+    };
+    const handleReset = clearFilters => {
+      clearFilters({
+        confirm: true,
+      });
+      state2.searchText = '';
+    };
 
 
     const isModalVisible = ref(false);  // 控制弹窗显示
@@ -283,7 +410,10 @@ export default {
       hasSelected,
       deleteReports,
       onSelectChange,
-      state
+      state,
+
+      handleSearch,
+      handleReset,
     };
   },
   name: "ReportManage"
