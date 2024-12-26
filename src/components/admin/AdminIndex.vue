@@ -6,21 +6,19 @@
       <main class="main-content" style="display: flex">
         <AdminSideBar/>
 
+        <a-flex vertical="vertical" style="width: 100%; height: 400px;background-color: white;margin: 25px">
+          <a-flex style="justify-content: space-between">
+            <a-radio-group v-model:value="range" button-style="solid" style="position: absolute;margin-left: 20px" @change="handleChange">
+              <a-radio-button value="0">1周</a-radio-button>
+              <a-radio-button value="1">1月</a-radio-button>
+              <a-radio-button value="2">3月</a-radio-button>
+              <a-radio-button value="3">1年</a-radio-button>
+            </a-radio-group>
+            <span style="font-weight: bold;font-size: 22px;flex: 1;">{{chartTitle}}</span>
+          </a-flex>
 
-      <a-flex vertical="vertical" style="width: 100%; height: 400px;background-color: white;margin: 25px">
-      <WebSocketExample/>
-        <a-flex>
-          <a-radio-group v-model:value="range" button-style="solid">
-            <a-radio-button value="0">1周</a-radio-button>
-            <a-radio-button value="1">1月</a-radio-button>
-            <a-radio-button value="2">3月</a-radio-button>
-            <a-radio-button value="3">1年</a-radio-button>
-          </a-radio-group>
-          <span style="font-weight: bold;font-size: 22px;margin-left: 40px">最近xx天的发帖量统计数据</span>
+          <e-charts :option="option" :auto-resize="true" />
         </a-flex>
-
-        <e-charts :option="option" :auto-resize="true"/>
-      </a-flex>
 
       </main>
     </a-layout-content>
@@ -34,18 +32,17 @@ import AdminSideBar from "@/components/admin/AdminSideBar";
 
 import adminService from "@/service/adminService";
 import {computed, ref} from "vue";
-import WebSocketExample from "@/components/message/messageDefine.vue"
 
 export default {
   components: {
     IndexHeader,
     AdminSideBar,
-    WebSocketExample
   },
   setup(){
     //模拟数据count的字段对应Y轴，date字段对应X轴
     const chartData = ref([]);
-    const range = ref("0");
+    const range = ref('0');
+    const chartTitle = ref("最近1周的发帖量统计数据");
     const option=computed(()=>{
       return{
         xAxis:{
@@ -72,12 +69,30 @@ export default {
       }catch (e) {
         console.log("获得帖子统计失败");
       }
-    }
+    };
+
+    const handleChange = () =>{
+      let x = range.value;
+      let y = "";
+      if(x==='0'){
+        y="1周";
+      }else if(x==='1'){
+        y="1月";
+      }else if(x==='2'){
+        y="3月";
+      }else if(x==='3'){
+        y="1年";
+      }
+      chartTitle.value = `最近${y}的发帖量统计数据`;
+      getStatPost();
+    };
 
     return {
       range,
       option,
+      chartTitle,
       getStatPost,
+      handleChange,
     };
   },
   name: "AdminIndex",
