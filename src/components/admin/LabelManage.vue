@@ -7,26 +7,29 @@
       <AdminSideBar/>
 
       <div class="table-button-container">
-        <a-button type="primary" @click="showAddUserModal" style="margin-top: 16px; margin-left: 16px;width: 80px;">
-          新增标签
-        </a-button>
+        <a-flex style="margin:10px 0">
 
-        <div style="margin-bottom: 16px">
-          <a-button
-              type="primary"
-              :disabled="!hasSelected"
-              :loading="state.loading"
-              @click="deleteUsers"
-              style="margin-top: 16px; margin-left: 16px; width: 120px;"
-          >
-            删除
+          <a-button type="primary" @click="showAddUserModal" style="margin-top: 16px; margin-left: 16px;width: 80px;">
+            新增标签
           </a-button>
-          <span style="margin-left: 8px">
-              <template v-if="hasSelected">
-                {{ `已选中 ${state.selectedRowKeys.length} 项` }}
-              </template>
-            </span>
-        </div>
+
+          <div style="margin-bottom: 16px">
+            <a-button
+                type="primary"
+                :disabled="!hasSelected"
+                :loading="state.loading"
+                @click="deleteUsers"
+                style="margin-top: 16px; margin-left: 16px; width: 80px;"
+            >
+              删除
+            </a-button>
+            <span style="margin-left: 8px">
+                <template v-if="hasSelected">
+                  {{ `已选中 ${state.selectedRowKeys.length} 项` }}
+                </template>
+              </span>
+          </div>
+        </a-flex>
 
         <a-table class="table-content"
                  :dataSource="dataSource"
@@ -64,14 +67,27 @@
         <a-form-item label="标签描述" :name="'description'">
           <a-input v-model:value="form.description" />
         </a-form-item>
-        <a-form-item label="创建时间" :name="'created_at'">
-          <a-input v-model:value="form.created_at" />
-        </a-form-item>
         <a-form-item label="图标" :name="'label_icon'">
-          <img :src="form.label_icon ? form.label_icon : require('@/assets/img/default_avatar2.jpg')"
-               alt="图标"
-               style="width: 50px; height: 50px; border-radius: 50%;"
-          />
+          <a-upload
+              v-model:file-list="label_icon_url"
+              :action="apiBaseUrl"
+              method="post"
+              @remove="handleIconCancelEdit"
+              @change="handleChangeEdit"
+              list-type="picture-card"
+              @preview="handlePreviewEdit"
+              :headers="headers">
+
+
+            <div v-if="!fileUploadEdit">
+              <PlusOutlined />
+              <div style="margin-top: 8px">上传</div>
+            </div>
+          </a-upload>
+          <a-modal :open="previewVisibleEdit" :title="previewTitleEdit" :footer="null" @cancel="handlePreviewCancelEdit">
+            <img alt="example" style="width: 100%" :src="previewImageEdit" />
+          </a-modal>
+
         </a-form-item>
       </a-form>
     </a-modal>
@@ -84,14 +100,26 @@
         <a-form-item label="标签描述" :name="'description'">
           <a-input v-model:value="addForm.description" />
         </a-form-item>
-        <a-form-item label="创建时间" :name="'created_at'">
-          <a-input v-model:value="addForm.created_at" />
-        </a-form-item>
         <a-form-item label="图标" :name="'label_icon'">
-          <img :src="addForm.label_icon ? addForm.label_icon : require('@/assets/img/default_avatar2.jpg')"
-               alt="图标"
-               style="width: 50px; height: 50px; border-radius: 50%;"
-          />
+          <a-upload
+              :action="apiBaseUrl"
+              method="post"
+              @remove="handleIconCancel"
+              @change="handleChange"
+              list-type="picture-card"
+              @preview="handlePreview"
+              :headers="headers">
+
+
+              <div v-if="!fileUpload">
+                <PlusOutlined />
+                <div style="margin-top: 8px">上传</div>
+              </div>
+          </a-upload>
+          <a-modal :open="previewVisible" :title="previewTitle" :footer="null" @cancel="handlePreviewCancel">
+            <img alt="example" style="width: 100%" :src="previewImage" />
+          </a-modal>
+
         </a-form-item>
       </a-form>
     </a-modal>
@@ -106,11 +134,15 @@ import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import { computed } from 'vue'
 import AdminSideBar from "@/components/admin/AdminSideBar";
 import labelService from "@/service/labelService";
+import {useStore} from "vuex";
+import {PlusOutlined} from '@ant-design/icons-vue';
+import dayjs from "dayjs";
 
 export default {
   components: {
     IndexHeader,
-    AdminSideBar
+    AdminSideBar,
+    PlusOutlined
   },
   setup(){
     const dataSource = ref([]);
@@ -160,6 +192,7 @@ export default {
     ]);
 
     const isModalVisible = ref(false);  // 控制弹窗显示
+    const label_icon_url = ref([]);
     const form = reactive({
       id: '',
       label_name: '',
@@ -173,6 +206,9 @@ export default {
       form.description = record.description;
       form.created_at = record.created_at;
       form.label_icon = record.label_icon;
+      label_icon_url.value.length = 0;
+      label_icon_url.value.push({url:record.label_icon});
+      console.log("label_icon_url: ", label_icon_url);
       isModalVisible.value = true;  // 显示弹窗
     };
     const handleSave = async () => {
@@ -189,12 +225,50 @@ export default {
       isModalVisible.value = false;  // 隐藏弹窗
     };
 
+    let fileUploadEdit = ref(true);
+
+    const handleChangeEdit = info => {
+      if(info.file.status === 'removed'){
+        return;
+      }
+      console.log("图片上传状态：", info);
+      console.log("form: ", form);
+      if (info.file.response !== undefined) {
+        if (info.file.response.code === 0) {
+          form.label_icon = info.file.response.data;
+          console.log("图片上传成功：", info);
+          fileUploadEdit.value = true;
+        }
+      }
+    };
+    const previewVisibleEdit = ref(false);
+    const previewImageEdit = ref('');
+    const previewTitleEdit = ref('');
+
+    const handlePreviewCancelEdit = () => {
+      previewVisibleEdit.value = false;
+      previewTitleEdit.value = '';
+    };
+    const handleIconCancelEdit = () => {
+      fileUploadEdit.value = false;
+      console.log('Preview canceled, fileUpload reset:', fileUploadEdit.value);
+    };
+    const handlePreviewEdit = async file => {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj);
+      }
+      previewImageEdit.value = file.url || file.preview;
+      previewVisibleEdit.value = true;
+      previewTitleEdit.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
+    };
+
+
+
 
     const isAddModalVisible = ref(false); // 控制新增弹窗显示
     const addForm = reactive({
       label_name: '',
       description: '',
-      created_at: '',
       label_icon: null,
     });
     const showAddUserModal = () => {
@@ -212,6 +286,55 @@ export default {
     const handleCancelAdd = () => {
       isAddModalVisible.value = false; // 取消时隐藏新增弹窗
     };
+    const apiBaseUrl = process.env.VUE_APP_API_BASE_URL+"/upload/labelIcon";
+    let fileUpload = ref(false);
+    const handleChange = info => {
+      if(info.file.status === 'removed'){
+        return;
+      }
+      console.log("图片上传状态：", info);
+      console.log("addForm: ", addForm);
+      if (info.file.response !== undefined) {
+        if (info.file.response.code === 0) {
+          addForm.label_icon = info.file.response.data;
+          console.log("图片上传成功：", info);
+          fileUpload.value = true;
+        }
+      }
+    };
+    const store = useStore();
+    const headers = {
+      authorization: store.state.token,
+    };
+    const previewVisible = ref(false);
+    const previewImage = ref('');
+    const previewTitle = ref('');
+
+    const handlePreviewCancel = () => {
+      previewVisible.value = false;
+      previewTitle.value = '';
+    };
+    const handleIconCancel = () => {
+      fileUpload.value = false;
+      console.log('Preview canceled, fileUpload reset:', fileUpload.value);
+    };
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+    const handlePreview = async file => {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj);
+      }
+      previewImage.value = file.url || file.preview;
+      previewVisible.value = true;
+      previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
+    };
+
 
 
     const state = reactive({
@@ -256,6 +379,9 @@ export default {
       try {
         const response = await labelService.getAllLabels();
         dataSource.value = response.data.data;
+        for(let i in dataSource.value){
+          dataSource.value[i].created_at = dayjs(dataSource.value[i].created_at).format('YYYY-MM-DD HH:mm:ss');
+        }
         isLoading.value = false;
       } catch (error) {
         console.error('获取标签信息错误', error);
@@ -277,6 +403,15 @@ export default {
       handleCancel,
       isModalVisible,
       form,
+      handleChangeEdit,
+      handlePreviewCancelEdit,
+      handleIconCancelEdit,
+      handlePreviewEdit,
+      previewVisibleEdit,
+      previewTitleEdit,
+      previewImageEdit,
+      fileUploadEdit,
+      label_icon_url,
 
 
       isAddModalVisible,
@@ -284,6 +419,16 @@ export default {
       showAddUserModal,
       handleAdd,
       handleCancelAdd,
+      apiBaseUrl,
+      handleChange,
+      headers,
+      handleIconCancel,
+      handlePreviewCancel,
+      handlePreview,
+      previewVisible,
+      previewTitle,
+      previewImage,
+      fileUpload,
 
 
       hasSelected,

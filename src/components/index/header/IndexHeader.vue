@@ -28,8 +28,10 @@
                   <a-button type="text" @click="toWrite"><EditOutlined />写文章</a-button>
                 </div>
 
-                <div class="header-item">
-                  <a-button type="text" @click="toAdmin"><BarChartOutlined />管理端</a-button>
+                <div v-if ="isAdmin">
+                  <div class="header-item">
+                    <a-button type="text" @click="toAdmin"><BarChartOutlined />管理端</a-button>
+                  </div>
                 </div>
 
                 <div class="header-item" v-if="!$store.state.isLogin">
@@ -81,6 +83,7 @@ export default {
     const userid = ref(0);
     const avatar = ref(null);
     const searchContentTemp = ref('');
+    const isAdmin = ref(false);
     const items = ref([
       {
         key: 'index',
@@ -124,6 +127,9 @@ export default {
                 if(store.getters.getId === -1){
                   console.log("获取用户: ",userid.value);
                   store.commit("setId",userid.value);
+                }
+                if(res.data.data.is_admin){
+                  isAdmin.value = true;
                 }
               }
             })
@@ -218,6 +224,7 @@ export default {
       toAdmin,
       getCurrSelectedKeys,
       onSearch,
+      isAdmin
     }
   },
 
