@@ -5,7 +5,7 @@
         <a-list-item class="list-item" @click="toUserHomePage(item.id)">
 
           <a-flex style="justify-content: flex-start;padding: 10px">
-            <a-avatar src="item.avatar" :size="60" style="align-self: center"/>
+            <a-avatar src="item.avatar" :size="60" style="align-self: center;flex-shrink: 0"/>
             <a-flex vertical="vertical" style="margin-left: 10px">
               <div class="user-info-name" style="text-align: start;font-size: 20px;font-weight: bold">{{ item.username }}</div>
               <div class="user-info-bio" style="text-align: start;font-size: 14px;margin: 10px 0 0 0">{{ item.bio }}</div>

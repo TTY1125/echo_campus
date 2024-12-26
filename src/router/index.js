@@ -54,10 +54,15 @@ const routes = [
     component: () => import("@/components/admin/ReportManage.vue"),
   },
   {
+    path: "/search",
+    name: "search",
+    component: () => import("@/components/index/IndexSearch.vue"),
+  },
+  {
     path: "/labelManage",
     name: "labelManage",
     component: () => import("@/components/admin/LabelManage.vue"),
-  }
+  },
 ]
 
 const router = createRouter({

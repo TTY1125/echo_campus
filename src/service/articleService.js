@@ -74,9 +74,9 @@ export default {
         });
     },
     // 搜索
-    searchPost(keyWord) {
+    searchPost(keyWord,offset) {
         return new Promise((resolve, reject) => {
-            axiosInstance.get(`/posts/search?keyword=${keyWord}`)
+            axiosInstance.get(`/posts/search?keyword=${keyWord}&offset=${offset}`)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });

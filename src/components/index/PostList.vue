@@ -16,8 +16,10 @@
               </div>
               <div class="index-post-content">{{ item.content }}</div>
               <a-flex class="index-post-extra" style="color: rgba(0,0,0,0.7);align-items: center">
+                <!--
                 <EyeOutlined style="margin-right: 6px;font-size: 20px;"/>
                 <span style="line-height: 20px;margin-right: 10px">{{ item.lookNum }}</span>
+                -->
                 <LikeOutlined style="margin-right: 6px;font-size: 20px"/>
                 <span style="line-height: 20px;margin-right: 10px">{{ item.likeNum }}</span>
                 <MessageOutlined style="margin-right: 6px;font-size: 20px"/>
@@ -50,7 +52,7 @@
 </template>
 
 <script>
-import { EyeOutlined,LikeOutlined,MessageOutlined } from '@ant-design/icons-vue';
+import {LikeOutlined,MessageOutlined } from '@ant-design/icons-vue';
 import {useApp} from "@/useApp";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -60,7 +62,6 @@ dayjs.extend(relativeTime);
 
 export default {
   components: {
-    EyeOutlined,
     LikeOutlined,
     MessageOutlined
   },
