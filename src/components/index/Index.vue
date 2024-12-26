@@ -138,7 +138,7 @@ export default {
   display:flex;
   background-color: #f0f2f5;
   //background-image:url('@/assets/img/back1.png');
-
+  //background-size: 20% auto;
   background-repeat:repeat;
 }
 
