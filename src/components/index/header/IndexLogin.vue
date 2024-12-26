@@ -50,7 +50,6 @@ import loginService from "@/service/loginService";
 import IndexRegister from "@/components/index/header/IndexRegister.vue"
 import { ref } from "vue";
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
 import { getCurrentInstance} from 'vue';
 import userInfoService from "@/service/userInfoService";
 
@@ -59,7 +58,6 @@ export default {
   setup() {
     const { proxy } = getCurrentInstance();
     const store = useStore();//用于获取 Vuex 实例，它在 setup 中替代了 this.$store
-    const router = useRouter();
 
     // 弹窗状态
     const isModalVisible = ref(false);
@@ -96,15 +94,15 @@ export default {
                   const infoRes = await userInfoService.getUserInfo();
                   store.commit("setId",infoRes.data.data.id);//更新用户id
                   // 刷新当前页面
-                  router.go(0);
+
                   isModalVisible.value = false;
                 }else{
                   console.log("登录失败: ", res);
                   proxy.$message.error("登录失败: ",res.data.message);
                 }
               }catch(e) {
-                console.log("登录错误: ", e);
-                proxy.$message.error("登录错误: ",e.desc);
+                console.log("登录错误1: ", e);
+                proxy.$message.error("登录错误1: ",e.desc);
               }
             })
             .catch(error => {

@@ -34,6 +34,11 @@ const routes = [
     component: () => import("@/components/label/LabelIndex.vue"),
   },
   {
+    path: "/label/:id",
+    name: "labelDetail",
+    component: () => import("@/components/label/LabelDetail.vue"),
+  },
+  {
     path: "/admin",
     name: "admin",
     component: () => import("@/components/admin/AdminIndex.vue"),
@@ -52,6 +57,11 @@ const routes = [
     path: "/search",
     name: "search",
     component: () => import("@/components/index/IndexSearch.vue"),
+  },
+  {
+    path: "/labelManage",
+    name: "labelManage",
+    component: () => import("@/components/admin/LabelManage.vue"),
   },
 ]
 

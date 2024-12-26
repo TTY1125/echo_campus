@@ -1,12 +1,14 @@
 <template>
   <a-layout id="components-layout-basic">
     <IndexHeader class="header"/>
+
     <a-layout-content>
       <main class="main-content" style="display: flex">
         <AdminSideBar/>
 
 
       <a-flex vertical="vertical" style="width: 100%; height: 400px;background-color: white;margin: 25px">
+      <WebSocketExample/>
         <a-flex>
           <a-radio-group v-model:value="range" button-style="solid">
             <a-radio-button value="0">1周</a-radio-button>
@@ -22,19 +24,23 @@
 
       </main>
     </a-layout-content>
+
   </a-layout>
 </template>
 
 <script>
 import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import AdminSideBar from "@/components/admin/AdminSideBar";
+
 import adminService from "@/service/adminService";
 import {computed, ref} from "vue";
+import WebSocketExample from "@/components/message/messageDefine.vue"
 
 export default {
   components: {
     IndexHeader,
-    AdminSideBar
+    AdminSideBar,
+    WebSocketExample
   },
   setup(){
     //模拟数据count的字段对应Y轴，date字段对应X轴
