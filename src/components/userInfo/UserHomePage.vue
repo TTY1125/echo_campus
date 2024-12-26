@@ -6,7 +6,7 @@
         <a-flex justify="space-between" style="width: 100%;display:flex;background-color:white;height:140px;">
           <a-flex>
             <a-avatar :size="88" :src="userData.profile_picture ? userData.profile_picture : require('@/assets/img/default_avatar.png')"
-                      style="justify-self: start;margin: 20px 30px"/>
+                      style="margin: 20px 30px;flex-shrink: 0"/>
 
             <div class="user-info-right" style="margin: 30px 20px 0 0;">
               <div class="user-info-name" style="text-align: start;font-size: 20px;font-weight: bold">{{ userData.username }}</div>
@@ -178,6 +178,7 @@ export default {
         for(let i in ret) {
           const userRes = await userInfoService.getOtherUserInfo(ret[i].followed_id);
           let currUser = userRes.data.data;
+          console.log(currUser);
           userFollowList.push(currUser);
         }
         userFollowListOffset+=10;

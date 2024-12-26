@@ -10,7 +10,6 @@ import 'mavon-editor/dist/css/index.css'
 import Echarts from 'vue-echarts'
 import * as echarts from 'echarts'
 
-
 const app = createApp(App)
 app.config.globalProperties.$message = message;
 

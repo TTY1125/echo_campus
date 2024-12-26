@@ -27,10 +27,13 @@ export default defineComponent({
   setup(){
     const {route} = useApp();
     const PostList = reactive([]);
+    let offset = 0;
+    let isLoading = false;
     const getPostList = async () =>{
+      isLoading = true;
       try{
         let searchContent = route.query.query;
-        let articleRes = await articleService.searchPost(searchContent);
+        let articleRes = await articleService.searchPost(searchContent,offset);
         let ret = articleRes.data.data;
         for(let i in ret){
           let currPost = {
@@ -68,15 +71,34 @@ export default defineComponent({
       }catch (e) {
         console.log("搜索错误",e);
       }
+      offset+=20;
+      isLoading = false;
     }
+
+    const handleScroll =  () => {
+      const scrollHeight = document.documentElement.scrollHeight; // 文档总高度
+      const scrollTop = window.scrollY || document.documentElement.scrollTop; // 当前滚动的高度
+      const windowHeight = window.innerHeight; // 浏览器窗口的高度
+
+      // 如果滚动到接近底部，加载更多内容
+      if (scrollHeight - scrollTop - windowHeight < 300 && !isLoading) {
+        getPostList(); // 加载更多帖子
+      }
+    };
+
     return{
       PostList,
       getPostList,
+      handleScroll,
     }
   },
   mounted() {
     this.getPostList();
-  }
+    window.addEventListener('scroll', this.handleScroll); // 监听滚动事件
+  },
+  beforeUnmount() {
+    window.removeEventListener('scroll', this.handleScroll); // 销毁组件时移除事件监听
+  },
 })
 </script>
 
