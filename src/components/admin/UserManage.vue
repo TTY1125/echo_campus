@@ -35,14 +35,11 @@
 
           <template #profile_picture="{ record }">
             <img :src="
-              record.profile_picture ? record.profile_picture : require('@/assets/img/default_avatar2.jpg')"
+              record.profile_picture ? record.profile_picture : 'http://192.168.114.3:8099/group1/M00/00/00/wKhyA2dnoEmAKKSYAACL7DjPdC8139.jpg'"
                  alt="Profile Picture"
                  style="width: 50px; height: 50px; border-radius: 50%;"
             />
           </template>
-          <!--            <template v-slot:num="slotProps">-->
-          <!--              {{(current - 1 ) * pageSize + slotProps.index + 1}}-->
-          <!--            </template>>-->
           <template #is_admin="{ record }">
             {{record.is_admin ? "管理员" : "用户"}}
           </template>
@@ -68,17 +65,29 @@
         <a-form-item label="邮箱" :name="'email'">
           <a-input v-model:value="form.email" />
         </a-form-item>
-        <a-form-item label="注册时间" :name="'created_at'">
-          <a-input v-model:value="form.created_at" />
-        </a-form-item>
         <a-form-item label="个性签名" :name="'bio'">
           <a-input v-model:value="form.bio" />
         </a-form-item>
         <a-form-item label="头像" :name="'profile_picture'">
-          <img :src="form.profile_picture ? form.profile_picture : require('@/assets/img/default_avatar2.jpg')"
-               alt="头像"
-               style="width: 50px; height: 50px; border-radius: 50%;"
-          />
+          <a-upload
+              v-model:file-list="profile_picture_url"
+              :action="apiBaseUrl"
+              method="post"
+              @remove="handleIconCancelEdit"
+              @change="handleChangeEdit"
+              list-type="picture-card"
+              @preview="handlePreviewEdit"
+              :headers="headers">
+
+
+            <div v-if="!fileUploadEdit">
+              <PlusOutlined />
+              <div style="margin-top: 8px">上传</div>
+            </div>
+          </a-upload>
+          <a-modal :open="previewVisibleEdit" :title="previewTitleEdit" :footer="null" @cancel="handlePreviewCancelEdit">
+            <img alt="example" style="width: 100%" :src="previewImageEdit" />
+          </a-modal>
         </a-form-item>
         <a-form-item label="权限" :name="'is_admin'">
           <a-select v-model:value="form.is_admin" :placeholder="'请选择权限'" style="width: 100%">
@@ -100,17 +109,28 @@
         <a-form-item label="邮箱" :name="'email'">
           <a-input v-model:value="addForm.email" />
         </a-form-item>
-        <a-form-item label="注册时间" :name="'created_at'">
-          <a-input v-model:value="addForm.created_at" />
-        </a-form-item>
         <a-form-item label="个性签名" :name="'bio'">
           <a-input v-model:value="addForm.bio" />
         </a-form-item>
         <a-form-item label="头像" :name="'profile_picture'">
-          <img :src="addForm.profile_picture ? addForm.profile_picture : require('@/assets/img/default_avatar2.jpg')"
-               alt="头像"
-               style="width: 50px; height: 50px; border-radius: 50%;"
-          />
+          <a-upload
+              :action="apiBaseUrl"
+              method="post"
+              @remove="handleIconCancel"
+              @change="handleChange"
+              list-type="picture-card"
+              @preview="handlePreview"
+              :headers="headers">
+
+
+            <div v-if="!fileUpload">
+              <PlusOutlined />
+              <div style="margin-top: 8px">上传</div>
+            </div>
+          </a-upload>
+          <a-modal :open="previewVisible" :title="previewTitle" :footer="null" @cancel="handlePreviewCancel">
+            <img alt="example" style="width: 100%" :src="previewImage" />
+          </a-modal>
         </a-form-item>
         <a-form-item label="权限" :name="'is_admin'">
           <a-select v-model:value="addForm.is_admin" :placeholder="'请选择权限'" style="width: 100%">
@@ -132,23 +152,18 @@ import userInfoService from "@/service/userInfoService";
 import { computed } from 'vue'
 import AdminSideBar from "@/components/admin/AdminSideBar";
 import dayjs from "dayjs";
+import {useStore} from "vuex";
+import {PlusOutlined} from '@ant-design/icons-vue';
 
 export default {
   components: {
     IndexHeader,
-    AdminSideBar
+    AdminSideBar,
+    PlusOutlined
   },
   setup(){
     const dataSource = ref([]);
     const columns = ref([
-      // {
-      //   title: '序号',
-      //   dataIndex: 'serial',
-      //   key: 'serial',
-      //   slots: {
-      //     customRender: 'num'
-      //   }
-      // },
       {
         title: 'ID',
         dataIndex: 'id',
@@ -199,13 +214,14 @@ export default {
     ]);
 
     const isModalVisible = ref(false);  // 控制弹窗显示
+    const profile_picture_url = ref([]);
     const form = reactive({
       id: '',
       username: '',
       email: '',
       created_at: '',
       bio: '',
-      profile_picture: null,
+      profile_picture: 'http://192.168.114.3:8099/group1/M00/00/00/wKhyA2dnoEmAKKSYAACL7DjPdC8139.jpg',
       is_admin: '',
     });
     const editUser = (record) => {
@@ -215,6 +231,10 @@ export default {
       form.created_at = record.created_at;
       form.bio = record.bio;
       form.profile_picture = record.profile_picture;
+      console.log("form: ", form);
+      console.log("record: ", record);
+      profile_picture_url.value.length = 0;
+      profile_picture_url.value.push({url:form.profile_picture});
       form.is_admin = { value: String(record.is_admin), label: record.is_admin ? '管理员' : '用户' };
       isModalVisible.value = true;  // 显示弹窗
     };
@@ -232,6 +252,47 @@ export default {
     const handleCancel = () => {
       isModalVisible.value = false;  // 隐藏弹窗
     };
+
+    let fileUploadEdit = ref(true);
+
+    const handleChangeEdit = info => {
+      if(info.file.status === 'removed'){
+        return;
+      }
+      console.log("图片上传状态：", info);
+      console.log("form: ", form);
+      if (info.file.response !== undefined) {
+        if (info.file.response.code === 0) {
+          form.profile_picture = info.file.response.data;
+          console.log("图片上传成功：", info);
+          fileUploadEdit.value = true;
+        }
+      }
+    };
+    const previewVisibleEdit = ref(false);
+    const previewImageEdit = ref('');
+    const previewTitleEdit = ref('');
+
+    const handlePreviewCancelEdit = () => {
+      previewVisibleEdit.value = false;
+      previewTitleEdit.value = '';
+    };
+    const handleIconCancelEdit = () => {
+      fileUploadEdit.value = false;
+      console.log('Preview canceled, fileUpload reset:', fileUploadEdit.value);
+    };
+    const handlePreviewEdit = async file => {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj);
+      }
+      previewImageEdit.value = file.url || file.preview;
+      previewVisibleEdit.value = true;
+      previewTitleEdit.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
+    };
+
+
+
+
 
 
     const isAddModalVisible = ref(false); // 控制新增弹窗显示
@@ -259,6 +320,54 @@ export default {
     };
     const handleCancelAdd = () => {
       isAddModalVisible.value = false; // 取消时隐藏新增弹窗
+    };
+    const apiBaseUrl = process.env.VUE_APP_API_BASE_URL+"/upload/picture";
+    let fileUpload = ref(false);
+    const handleChange = info => {
+      if(info.file.status === 'removed'){
+        return;
+      }
+      console.log("图片上传状态：", info);
+      console.log("addForm: ", addForm);
+      if (info.file.response !== undefined) {
+        if (info.file.response.code === 0) {
+          addForm.profile_picture = info.file.response.data;
+          console.log("图片上传成功：", info);
+          fileUpload.value = true;
+        }
+      }
+    };
+    const store = useStore();
+    const headers = {
+      authorization: store.state.token,
+    };
+    const previewVisible = ref(false);
+    const previewImage = ref('');
+    const previewTitle = ref('');
+
+    const handlePreviewCancel = () => {
+      previewVisible.value = false;
+      previewTitle.value = '';
+    };
+    const handleIconCancel = () => {
+      fileUpload.value = false;
+      console.log('Preview canceled, fileUpload reset:', fileUpload.value);
+    };
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+    const handlePreview = async file => {
+      if (!file.url && !file.preview) {
+        file.preview = await getBase64(file.originFileObj);
+      }
+      previewImage.value = file.url || file.preview;
+      previewVisible.value = true;
+      previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
     };
 
 
@@ -328,6 +437,15 @@ export default {
       handleCancel,
       isModalVisible,
       form,
+      handleChangeEdit,
+      handlePreviewCancelEdit,
+      handleIconCancelEdit,
+      handlePreviewEdit,
+      previewVisibleEdit,
+      previewTitleEdit,
+      previewImageEdit,
+      fileUploadEdit,
+      profile_picture_url,
 
 
       isAddModalVisible,
@@ -335,7 +453,16 @@ export default {
       showAddUserModal,
       handleAdd,
       handleCancelAdd,
-
+      apiBaseUrl,
+      handleChange,
+      headers,
+      handleIconCancel,
+      handlePreviewCancel,
+      handlePreview,
+      previewVisible,
+      previewTitle,
+      previewImage,
+      fileUpload,
 
       hasSelected,
       deleteUsers,

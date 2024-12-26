@@ -118,7 +118,7 @@ export default {
         key: 'admin_reason',
       },
       {
-        title: '注册时间',
+        title: '举报时间',
         dataIndex: 'created_at',
         key: 'created_at',
       },
