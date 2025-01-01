@@ -135,6 +135,7 @@ export default {
             likeNum: 0,
             commentNum: 0,
             is_handled: ret[i].is_handled,
+            is_deleted: ret[i].is_deleted,
             pic: null,
           };
           //查询作者信息

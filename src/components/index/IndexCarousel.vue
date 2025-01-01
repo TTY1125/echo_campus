@@ -1,10 +1,3 @@
-<script setup>
-import {
-  LeftCircleOutlined,
-  RightCircleOutlined
-} from '@ant-design/icons-vue';
-</script>
-
 <template>
   <a-carousel arrows>
     <template #prevArrow>
@@ -18,13 +11,30 @@ import {
       </div>
     </template>
     <div>
-        <img src="@/assets/img/indexPic.png" style="height: 100%;width: 100%;object-fit: fill;" alt="index_post_img" />
+        <img src="@/assets/img/indexPic1.png" style="height:300px;cursor: pointer" alt="index_post_img" @click="goToDetail(5000)" />
     </div>
-    <div><h3>2</h3></div>
-    <div><h3>3</h3></div>
-    <div><h3>4</h3></div>
+    <div>
+      <img src="@/assets/img/indexPic1.png" style="height:300px;cursor: pointer" alt="index_post_img" @click="goToDetail(5000)" />
+    </div>
   </a-carousel>
 </template>
+
+<script>
+import {LeftCircleOutlined, RightCircleOutlined} from '@ant-design/icons-vue';
+import {useApp} from "@/useApp";
+export default {
+  components: {LeftCircleOutlined, RightCircleOutlined},
+  setup(){
+    const {router} = useApp();
+    const goToDetail = id =>{
+      router.push("/detail/"+id);
+    };
+    return{
+      goToDetail,
+    }
+  }
+}
+</script>
 
 <style lang="less" scoped>
 :deep(.slick-slide) {
@@ -56,4 +66,9 @@ import {
 :deep(.slick-slide h3) {
   color: #fff;
 }
+
+:deep(.slick-dots.slick-dots-bottom) {
+  margin-bottom: 0;
+}
+
 </style>

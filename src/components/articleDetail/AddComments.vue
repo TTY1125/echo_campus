@@ -82,9 +82,10 @@ export default {
           content: commentValue.value,
         };
         await addReply(data);
-      }else if(props.post_id && !props.comment_id && props.reply_id){
+      }else if(props.post_id && props.comment_id && props.reply_id){
         const data = {
           post_id: props.post_id,
+          comment_id: props.comment_id,
           reply_id: props.reply_id,
           content: commentValue.value,
         };

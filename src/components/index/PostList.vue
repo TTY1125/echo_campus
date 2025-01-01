@@ -9,11 +9,7 @@
             </div>
 
             <a-col class="index-post-right">
-              <div class="index-post-title">{{ item.title }}
-                <span v-if="item.is_handled" class="post-status">
-                    被举报
-                </span>
-              </div>
+              <div class="index-post-title">{{ item.title }}</div>
               <div class="index-post-content">{{ item.content }}</div>
               <a-flex class="index-post-extra" style="color: rgba(0,0,0,0.7);align-items: center">
                 <!--
@@ -30,6 +26,13 @@
                 <a-tooltip :title="item.created_at.format('YYYY-MM-DD HH:mm:ss')">
                   <span style="margin-left: 15px;color: rgba(0,0,0,0.7)">{{ item.created_at.fromNow() }}</span>
                 </a-tooltip>
+
+                <span v-if="item.is_handled" class="post-status">
+                    被举报
+                </span>
+                <span v-if="item.is_deleted" class="post-status">
+                    被审核删除
+                </span>
 
               </a-flex>
             </a-col>

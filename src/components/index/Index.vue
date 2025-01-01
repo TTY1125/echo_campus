@@ -3,18 +3,25 @@
     <IndexHeader class="header"/>
 
     <a-layout-content>
-      <main class="main-content">
-        <a-col :lg="{span:14,offset:2}" :xs="{span:20,offset:2}">
+      <main class="main-content" style="min-height: 756px">
+        <a-col :lg="{span:13,offset:3}" :xs="{span:20,offset:2}">
           <!-- 走马灯 -->
           <IndexCarousel style="margin-bottom: 10px" />
           <!-- 首页帖子 -->
           <IndexPosts :postsList="indexPostsList"/>
         </a-col>
 
-        <a-col class="sider" :lg="{span:6}" :sm="{span:0}" :xs="{span:0}" style="border-left: 20px solid #f0f2f5">
+        <a-col class="sider" :lg="{span:5}" :sm="{span:0}" :xs="{span:0}" style="border-left: 20px solid #f0f2f5">
           <div style="margin-bottom: 20px;height: 200px;  background-color: white;  align-content: center;justify-content: center;">
             <!-- <h3 style="font-size: 24px;font-weight: bold;">回声校园</h3> -->
-            <img src="../../assets/img/logo1.png" alt="logo_img" style="height: 56px"/>
+            <a-flex vertical="vertical" style="justify-content: center;align-items: center;margin:0 10px">
+              <img src="../../assets/img/logo1.png" alt="logo_img" style="height: 50px;width: 140px"/>
+              <span style="font-size: 14px;line-height: 28px">
+                星光之下，回声流转；心灵之间，知音相见。
+                无论是徜徉知识海洋，还是静听风起花落，
+                让我们在回声里相遇，点亮属于彼此的星河。
+              </span>
+            </a-flex>
           </div>
           <!-- position: sticky; top:64px; -->
 
@@ -23,7 +30,7 @@
                 <FireOutlined style="font-size: 20px;margin-right: 10px"/>
                 <span style="font-weight: bold;font-size: 20px;align-content:center;">热门文章</span>
               </a-flex>
-              <HotList :posts-list="hotPostList"/>
+              <HotList/>
             </a-flex>
 
         </a-col>
@@ -58,8 +65,6 @@ export default {
     const indexPostsList = reactive([]);
     let currIndex = 0;
     let isLoading = false;
-    const hotPostList = reactive([]);
-
     const getIndexArticles=async()=>{
       isLoading = true;
       try{
@@ -105,20 +110,6 @@ export default {
       }
     };
 
-    const getHotArticles=async()=>{
-      try{
-        const articleRes = await articleService.getHotPost();
-        let resData = articleRes.data.data;
-        for(let i in resData){
-          hotPostList.push(resData[i]);
-          hotPostList[i].index = Number(i)+1;
-        }
-        console.log("获取热门帖子误",hotPostList);
-      }catch(e){
-        console.log("获取热门帖子错误",e);
-      }
-    };
-
     const handleScroll =  () => {
       const scrollHeight = document.documentElement.scrollHeight; // 文档总高度
       const scrollTop = window.scrollY || document.documentElement.scrollTop; // 当前滚动的高度
@@ -132,15 +123,12 @@ export default {
 
     return{
       indexPostsList,
-      hotPostList,
       getIndexArticles,
-      getHotArticles,
       handleScroll,
     }
   },
   mounted() {
     this.getIndexArticles();
-    this.getHotArticles();
     window.addEventListener('scroll', this.handleScroll); // 监听滚动事件
   },
   beforeUnmount() {

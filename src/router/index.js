@@ -44,6 +44,11 @@ const routes = [
     component: () => import("@/components/admin/AdminIndex.vue"),
   },
   {
+    path: "/about",
+    name: "about",
+    component: () => import("@/components/about/AboutIndex.vue"),
+  },
+  {
     path: "/userManage",
     name: "userManage",
     component: () => import("@/components/admin/UserManage.vue"),

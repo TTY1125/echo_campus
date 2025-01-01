@@ -31,11 +31,16 @@
                   <span style="margin-left: 4px;">{{item.replyLikeNum}}</span>
                 </div>
 
+                <div class="button-item" style="cursor: pointer;margin:0 4px;" @click="showAddComment(item.id)">
+                  <MessageOutlined style="margin:0 4px;"/>
+                </div>
 
                 <div class="button-item" v-if="item.user_id === userId" style="cursor: pointer;margin-left: 10px" @click="deleteReply(item.id)">
                   <DeleteOutlined />
                 </div>
               </a-flex>
+
+              <addComment v-if="item.addReplyIsShown" :avatar="avatar" :post_id="postId" :comment_id="commentId" :reply_id="item.id" style="background-color: #f7f8fa"/>
 
             </template>
             <template #datetime>
@@ -56,7 +61,13 @@
 
 import {defineComponent, reactive, createVNode, ref, watch} from "vue";
 import { Modal } from 'ant-design-vue';
-import {DeleteOutlined, LikeFilled, LikeOutlined, ExclamationCircleOutlined} from "@ant-design/icons-vue";
+import {
+  DeleteOutlined,
+  LikeFilled,
+  LikeOutlined,
+  ExclamationCircleOutlined,
+  MessageOutlined
+} from "@ant-design/icons-vue";
 import addComment from "@/components/articleDetail/AddComments.vue";
 import replyService from "@/service/replyService";
 import dayjs from "dayjs";
@@ -65,7 +76,7 @@ import likeFavFowService from "@/service/likeFavFowService";
 import {useApp} from "@/useApp";
 
 export default defineComponent({
-  components: {addComment, LikeOutlined, LikeFilled, DeleteOutlined},
+  components: {MessageOutlined, addComment, LikeOutlined, LikeFilled, DeleteOutlined},
   props: {
     avatar: {
       default: () => null
@@ -181,7 +192,12 @@ export default defineComponent({
       }else{
         proxy.$message.error("无法获取userid")
       }
-    }
+    };
+
+    const showAddComment = commentId =>{
+      const item = replyList.find(item => item.id === commentId);
+      item.addReplyIsShown = !item.addReplyIsShown;
+    };
 
     return{
       replyList,
@@ -189,6 +205,7 @@ export default defineComponent({
       likeReply,
       deleteReply,
       toUserHomePage,
+      showAddComment,
     }
   },
   mounted() {

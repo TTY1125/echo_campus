@@ -1,16 +1,16 @@
 <template>
-  <a-layout id="components-layout-basic">
+  <a-layout id="components-layout-basic" style="background-color:#f0f2f5;">
     <IndexHeader class="header"/>
 
     <a-layout-content style="padding-top: 74px;z-index: 0;">
       <main class="main-content" style="display: flex;">
-        <a-col :lg="{span:14,offset:2}" :xs="{span:20,offset:2}">
+        <a-col :lg="{span:13,offset:3}" :xs="{span:20,offset:2}">
 
           <div class="title_content" style="background-color: white;padding: 20px 30px;">
-            <span style="font-weight: bold;font-size: 32px;display: flex;">{{postTitle}}</span>
+            <span style="font-weight: bold;font-size: 32px;display: flex;text-align: start">{{postTitle}}</span>
 
             <a-flex style="margin-top: 10px;justify-content: flex-start">
-              <a-avatar :src="postAuthorAvatar" :size="46"/>
+              <a-avatar :src="postAuthorAvatar" :size="46" @click="toUserHomePage(postAuthorId)" style="cursor: pointer"/>
               <a-flex vertical="vertical" style="justify-content: space-between;text-align: start;margin-left: 10px">
                 <span style="font-size: 19px">{{postAuthorName}}</span>
                 <span style="font-size: 14px">{{postCreatedAt}}</span>
@@ -18,7 +18,7 @@
               <FollowButton :id="postAuthorId" v-if="userId!==postAuthorId" style="margin-left: auto;align-self: center"/>
             </a-flex>
 
-            <a-row style="margin-top: 10px;">
+            <a-row style="margin-top: 10px;" v-if="postLabels.length>0">
               <span style="font-weight: bold; margin-right: 8px;">标签:</span> <!-- 标签前的文本 -->
               <a-col v-for="(label, index) in postLabels" :key="index" style="margin-right: 8px;">
                 <a-tag color="blue"
@@ -60,7 +60,7 @@
                 <span>举报</span>
               </a-button>
 
-              <a-button v-if="userId===postAuthorId" size="large" @click="likePost" style="margin-left: auto;">
+              <a-button v-if="userId===postAuthorId" size="large" @click="deletePost" style="margin-left: auto;">
                 <DeleteOutlined/>
                 <span>删除文章</span>
               </a-button>
@@ -77,16 +77,28 @@
         </a-col>
 
         <!-- 侧栏 -->
-        <a-col class="sider" :lg="{span:6}" :sm="{span:0}" :xs="{span:0}" style="border-left: 20px solid #f0f2f5">
+        <a-col class="sider" :lg="{span:5}" :sm="{span:0}" :xs="{span:0}" style="border-left: 20px solid #f0f2f5">
           <div style="margin-bottom: 20px;height: 200px;  background-color: white;  align-content: center;justify-content: center;">
             <!-- <h3 style="font-size: 24px;font-weight: bold;">回声校园</h3> -->
-            <img src="../../assets/img/logo1.png" alt="logo_img" style="height: 56px"/>
+            <a-flex vertical="vertical" style="justify-content: center;align-items: center;margin:0 10px">
+              <img src="../../assets/img/logo1.png" alt="logo_img" style="height: 50px;width: 140px"/>
+              <span style="font-size: 14px;line-height: 28px">
+                星光之下，回声流转；心灵之间，知音相见。
+                无论是徜徉知识海洋，还是静听风起花落，
+                让我们在回声里相遇，点亮属于彼此的星河。
+              </span>
+            </a-flex>
           </div>
           <!-- position: sticky; top:64px; -->
-          <div style="margin-bottom: 20px;height: 400px;  background-color: white; text-align: start;  align-items: start;justify-items: start;">
-            <span style="font-weight: bold"></span><br/>
-            <span style="font-weight: bold"></span>
-          </div>
+
+          <a-flex vertical="vertical" style="margin-bottom: 20px;background-color: white;padding: 18px 0">
+            <a-flex style="height: 30px;align-content: center;align-self: center">
+              <FireOutlined style="font-size: 20px;margin-right: 10px"/>
+              <span style="font-weight: bold;font-size: 20px;align-content:center;">热门文章</span>
+            </a-flex>
+            <HotList/>
+          </a-flex>
+
         </a-col>
 
         <a-modal v-model:visible="isModalVisible" title="举报原因" @ok="handleSave(form)" @cancel="handleCancel">
@@ -104,7 +116,7 @@
 </template>
 
 <script>
-import {LikeOutlined,LikeFilled,StarOutlined,StarFilled,DeleteOutlined} from '@ant-design/icons-vue';
+import {LikeOutlined, LikeFilled, StarOutlined, StarFilled, DeleteOutlined, FireOutlined} from '@ant-design/icons-vue';
 import {useApp} from "@/useApp";
 import {ref, reactive} from "vue";
 import dayjs from 'dayjs';
@@ -119,11 +131,15 @@ import "dayjs/locale/zh-cn";
 import reportService from "@/service/reportService";
 import labelService from "@/service/labelService";
 import {useRouter} from 'vue-router';
+import HotList from "@/components/index/HotList.vue";
 dayjs.locale("zh-cn");
 dayjs.extend(relativeTime);
 
 export default {
-  components: {IndexHeader,LikeOutlined,LikeFilled,articleComments,StarOutlined,StarFilled,DeleteOutlined,FollowButton},
+  components: {
+    FireOutlined,
+    HotList,
+    IndexHeader,LikeOutlined,LikeFilled,articleComments,StarOutlined,StarFilled,DeleteOutlined,FollowButton},
   setup(){
     const { route, store, proxy } = useApp();
     const isAvatarNull = ref(true);
@@ -220,6 +236,22 @@ export default {
       }
     };
 
+    const toIndex = () => {
+      router.push('/');
+    };
+
+    const deletePost = async ()=>{
+      try{
+        await articleService.deletePost(postId.value);
+        proxy.$message.success("文章删除成功");
+        toIndex();
+      }catch (e) {
+        proxy.$message.error("文章删除失败");
+        console.log("删除失败",e);
+      }
+    };
+
+
     const favouritePost = async ()=>{
       try{
         if(!postIsFavourite.value){//点赞
@@ -293,7 +325,14 @@ export default {
     };
     const handleLabelClick = (label) => {
       router.push('/label/' + label.id);
-    }
+    };
+    const toUserHomePage = userId =>{
+      if(userId){
+        router.push('/user/'+userId);
+      }else{
+        proxy.$message.error("无法获取userid")
+      }
+    };
     return{
       postTitle,
       postContent,
@@ -312,6 +351,7 @@ export default {
       gerCurrentArticle,
       initUserInfo,
       likePost,
+      deletePost,
       favouritePost,
       follow,
       reportPost,
@@ -320,7 +360,8 @@ export default {
       isModalVisible,
       form,
       postLabels,
-      handleLabelClick
+      handleLabelClick,
+      toUserHomePage,
     }
   },
   mounted() {

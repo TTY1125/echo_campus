@@ -4,7 +4,7 @@
 
       <a-layout-header style="background:#ffffff;padding: 0">
         <div class="main-header">
-          <a-col span=20 offset=2 >
+          <a-col span=18 offset=3 >
             <a-flex justify="space-between">
               <a-flex class="header-left-content"><!-- 左侧内容 -->
                 <a-flex align="center">
@@ -46,9 +46,11 @@
                   </a-avatar>
                 </div>
 
+                <!--
                 <div class="header-item">
                   <a-button type="primary" @click="showToken">token</a-button>
                 </div>
+                -->
 
                 <div class="header-item" v-if="$store.state.isLogin">
                   <a-button type="text" @click="logout"><LogoutOutlined />退出登录</a-button>
@@ -146,7 +148,9 @@ export default {
     const toTags = () => {
       router.push('/label');
     };
-
+    const toAbout = () => {
+      router.push('/about');
+    };
     const toAdmin = () => {
       router.push('/admin');
     };
@@ -158,6 +162,9 @@ export default {
       }
       if(event.key === "label"){
         toTags();
+      }
+      if(event.key === "about"){
+        toAbout();
       }
     };
     const toUserHomePage = () => {
@@ -177,7 +184,6 @@ export default {
         router.push('/write');
       }
     };
-
     const getCurrSelectedKeys = ()=>{
       let currName = route.name;
       currSelectedKeys.value.pop();

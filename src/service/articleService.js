@@ -81,6 +81,14 @@ export default {
                 .catch(err => reject(err));
         });
     },
+    // 删除帖子
+    deletePost(id) {
+        return new Promise((resolve, reject) => {
+            axiosInstance.delete(`/posts/${id}`)
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    },
     // 获取热门帖子
     getHotPost() {
         return new Promise((resolve, reject) => {

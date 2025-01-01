@@ -31,6 +31,7 @@ import PostList from "@/components/index/PostList.vue";
 import userInfoService from "@/service/userInfoService";
 import commentService from "@/service/commentService";
 import likeFavFowService from "@/service/likeFavFowService";
+import articleService from "@/service/articleService";
 
 export default {
   components: {PostList, IndexHeader},
@@ -89,6 +90,9 @@ export default {
           currPost.likeNum = postLikeNumRes.data.data;
           let commentNumRes = await commentService.getComments(0,currPost.id);
           currPost.commentNum = commentNumRes.data.data.length;
+          //查询封面图片
+          let picRes = await articleService.getPostPic(currPost.id);
+          currPost.pic = picRes.data.data;
           indexLabelsList.push(currPost);
         }
         isLoading = false;
