@@ -1,24 +1,25 @@
 <template>
-  <a-row style="min-height: 800px">
-    <a-col :span="16" :offset="4">
+  <a-row style="height: 800px">
+    <a-col :span="16" :offset="4" style="height: 800px">
 
       <a-flex align="center" style="margin: 10px 0 ">
         <a-button style="height: 100%;" @click="toIndex">
           <ArrowLeftOutlined/>
           <span>返回首页</span>
         </a-button>
-        <a-input class="write-item" v-model:value="title" placeholder="输入文章标题" size="large" style="margin:0 10px;"/>
+        <a-input class="write-item" v-model:value="title" placeholder="输入文章标题" size="large" show-count :maxlength="30" style="margin:0 10px;"/>
         <a-button type="primary" @click="submit">发布文章</a-button>
       </a-flex>
 
-      <div style="height: 92%;width: 100%;">
+      <div style="width: 100%;">
         <mavon-editor
             ref=md
             v-model="content_md"
             @imgAdd="imgAdd"
             @imgDel="imgDel"
             @change="markdownChange"
-            style="z-index: 0"/>
+            codeStyle="obsidian"
+            style="z-index: 0;max-height: 740px;"/>
       </div>
 
     </a-col>

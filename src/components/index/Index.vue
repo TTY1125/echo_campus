@@ -17,13 +17,14 @@
             <img src="../../assets/img/logo1.png" alt="logo_img" style="height: 56px"/>
           </div>
           <!-- position: sticky; top:64px; -->
-          <div style="margin-bottom: 20px;height: 400px;display: flex;  background-color: white; justify-content: center;">
-            <a-flex style="margin-top: 18px;height: 30px;align-content: center">
-              <FireOutlined style="font-size: 20px"/>
-              <span style="font-weight: bold;font-size: 20px;text-align:center;">热门文章</span>
-            </a-flex>
 
-          </div>
+            <a-flex vertical="vertical" style="margin-bottom: 20px;background-color: white;padding: 18px 0">
+              <a-flex style="height: 30px;align-content: center;align-self: center">
+                <FireOutlined style="font-size: 20px;margin-right: 10px"/>
+                <span style="font-weight: bold;font-size: 20px;align-content:center;">热门文章</span>
+              </a-flex>
+              <HotList :posts-list="hotPostList"/>
+            </a-flex>
 
         </a-col>
 
@@ -39,6 +40,7 @@ import IndexHeader from "@/components/index/header/IndexHeader.vue";
 import { FireOutlined } from '@ant-design/icons-vue';
 import IndexCarousel from "@/components/index/IndexCarousel.vue";
 import IndexPosts from "@/components/index/PostList.vue";
+import HotList from "@/components/index/HotList.vue";
 import {reactive} from "vue";
 import articleService from "@/service/articleService";
 import likeFavFowService from "@/service/likeFavFowService";
@@ -46,6 +48,7 @@ import dayjs from "dayjs";
 import userInfoService from "@/service/userInfoService";
 export default {
   components:{
+    HotList,
     IndexCarousel,
     IndexHeader,
     IndexPosts,
@@ -55,6 +58,7 @@ export default {
     const indexPostsList = reactive([]);
     let currIndex = 0;
     let isLoading = false;
+    const hotPostList = reactive([]);
 
     const getIndexArticles=async()=>{
       isLoading = true;
@@ -101,6 +105,20 @@ export default {
       }
     };
 
+    const getHotArticles=async()=>{
+      try{
+        const articleRes = await articleService.getHotPost();
+        let resData = articleRes.data.data;
+        for(let i in resData){
+          hotPostList.push(resData[i]);
+          hotPostList[i].index = Number(i)+1;
+        }
+        console.log("获取热门帖子误",hotPostList);
+      }catch(e){
+        console.log("获取热门帖子错误",e);
+      }
+    };
+
     const handleScroll =  () => {
       const scrollHeight = document.documentElement.scrollHeight; // 文档总高度
       const scrollTop = window.scrollY || document.documentElement.scrollTop; // 当前滚动的高度
@@ -114,12 +132,15 @@ export default {
 
     return{
       indexPostsList,
+      hotPostList,
       getIndexArticles,
+      getHotArticles,
       handleScroll,
     }
   },
   mounted() {
     this.getIndexArticles();
+    this.getHotArticles();
     window.addEventListener('scroll', this.handleScroll); // 监听滚动事件
   },
   beforeUnmount() {
@@ -147,6 +168,9 @@ export default {
   //position: sticky;
   //top:64px;
   //z-index: 900;
+  .anticon,.anticon-fire{
+    align-content: center;
+  }
 }
 
 </style>

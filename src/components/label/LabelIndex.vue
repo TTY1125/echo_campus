@@ -2,11 +2,15 @@
   <a-layout id="components-layout-basic">
     <IndexHeader class="header"/>
 
-    <a-layout-content>
-      <main class="main-content">
-        <LabelContent :data="indexLabelsList"/>
-      </main>
-    </a-layout-content>
+    <a-row style="min-height: 756px;background-color: #f0f2f5">
+      <a-col :span="16" :offset="4">
+        <a-layout-content>
+          <main class="main-content">
+            <LabelContent :data="indexLabelsList"/>
+          </main>
+        </a-layout-content>
+      </a-col>
+    </a-row>
 
   </a-layout>
 </template>
@@ -85,7 +89,7 @@ export default {
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScroll); // 销毁组件时移除事件监听
   },
-  
+
   name: 'LabelIndex',
 }
 

@@ -2,17 +2,22 @@
   <a-layout id="components-layout-basic">
     <IndexHeader class="header"/>
 
-    <div class="content-wrapper">
-<!--      <a-avatar class="avatar" :size="60" :src="labelData.label_icon"/>-->
-      <a-badge :count="labelData.post_num" class="avatar-badge">
-        <a-avatar class="avatar" :size="60" :src="labelData.label_icon" />
-        <div class="title">{{ labelData.label_name }}</div>
-        <div class="article-count">
-          {{ labelData.post_num || 0 }} 篇文章
+    <a-row style="min-height: 756px;background-color: #f0f2f5">
+      <a-col :span="16" :offset="4">
+        <div class="content-wrapper">
+          <!--      <a-avatar class="avatar" :size="60" :src="labelData.label_icon"/>-->
+          <a-badge :count="labelData.post_num" class="avatar-badge" style="margin-top: 20px">
+            <a-avatar class="avatar" :size="60" :src="labelData.label_icon" />
+            <div class="title">{{ labelData.label_name }}</div>
+            <div class="article-count">
+              {{ labelData.post_num || 0 }} 篇文章
+            </div>
+          </a-badge>
+          <PostList :postsList="indexLabelsList" style="margin-top: 20px"/>
         </div>
-      </a-badge>
-      <PostList :postsList="indexLabelsList"/>
-    </div>
+      </a-col>
+    </a-row>
+
   </a-layout>
 </template>
 
