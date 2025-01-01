@@ -7,7 +7,7 @@
         <AdminSideBar/>
 
         <a-flex vertical="vertical" style="width: 100%; height: 400px;background-color: white;margin: 25px">
-          <a-flex style="justify-content: space-between">
+          <a-flex style="justify-content: space-between;margin-top: 25px">
             <a-radio-group v-model:value="range" button-style="solid" style="position: absolute;margin-left: 20px" @change="handleChange">
               <a-radio-button value="0">1周</a-radio-button>
               <a-radio-button value="1">1月</a-radio-button>
