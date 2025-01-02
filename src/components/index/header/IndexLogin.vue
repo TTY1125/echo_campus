@@ -51,11 +51,13 @@ import IndexRegister from "@/components/index/header/IndexRegister.vue"
 import { ref } from "vue";
 import { useStore } from 'vuex';
 import { getCurrentInstance} from 'vue';
+import { useApp } from "@/useApp";
 import userInfoService from "@/service/userInfoService";
 
 export default {
   components: {IndexRegister},
   setup() {
+    const { router } = useApp();
     const { proxy } = getCurrentInstance();
     const store = useStore();//用于获取 Vuex 实例，它在 setup 中替代了 this.$store
 
@@ -94,7 +96,7 @@ export default {
                   const infoRes = await userInfoService.getUserInfo();
                   store.commit("setId",infoRes.data.data.id);//更新用户id
                   // 刷新当前页面
-
+                  router.go(0);
                   isModalVisible.value = false;
                 }else{
                   console.log("登录失败: ", res);
