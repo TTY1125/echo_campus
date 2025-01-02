@@ -424,7 +424,7 @@ export default {
     const handleCancelAdd = () => {
       isAddModalVisible.value = false; // 取消时隐藏新增弹窗
     };
-    const apiBaseUrl = process.env.VUE_APP_API_BASE_URL+"/upload/picture";
+    const apiBaseUrl = process.env.VUE_APP_API_BASE_URL+"/upload/otherPicture";
     let fileUpload = ref(false);
     const handleChange = info => {
       if(info.file.status === 'removed'){
